@@ -10,8 +10,8 @@ import {
   CreateUserDto,
   FineOneUserDto,
   UpdateUserDto,
-  User,
   UserList,
+  UserResponse,
 } from './types';
 import { lastValueFrom } from 'rxjs';
 
@@ -25,7 +25,8 @@ export class UserService implements OnModuleInit {
     this.userServiceClient = this.client.getService<UserServiceClient>(USER_SERVICE_NAME);
   }
 
-  async createUser(dto: CreateUserDto): Promise<User> {
+  async createUser(dto: CreateUserDto): Promise<UserResponse> {
+    console.log("hello");
     return lastValueFrom(this.userServiceClient.createUser(dto));
   }
 
@@ -33,15 +34,15 @@ export class UserService implements OnModuleInit {
     return lastValueFrom(this.userServiceClient.findAllUsers({}));
   }
 
-  async findUserById(dto: FineOneUserDto): Promise<User> {
+  async findUserById(dto: FineOneUserDto): Promise<UserResponse> {
     return lastValueFrom(this.userServiceClient.findUserById(dto));
   }
 
-  async updateUser(dto: UpdateUserDto): Promise<User> {
+  async updateUser(dto: UpdateUserDto): Promise<UserResponse> {
     return lastValueFrom(this.userServiceClient.updateUser(dto));
   }
 
-  async deleteUser(dto: FineOneUserDto): Promise<User> {
+  async deleteUser(dto: FineOneUserDto): Promise<UserResponse> {
     return lastValueFrom(this.userServiceClient.deleteUser(dto));
   }
 }

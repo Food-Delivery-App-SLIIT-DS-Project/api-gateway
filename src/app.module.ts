@@ -9,34 +9,47 @@ import { join } from 'path';
 import { UserService } from './user/user.service';
 import { UserController } from './user/user.controller';
 import { USER_PACKAGE_NAME, USER_SERVICE_NAME } from './user/types';
+import { AppController } from './app.controller';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
+import { AUTH_PACKAGE_NAME, AUTH_SERVICE_NAME } from './auth/types';
 
 @Module({
   imports: [
-    
     ConfigModule.forRoot({ isGlobal: true }),
 
     // Register microservices (gRPC clients)
     ClientsModule.register([
+      // auth service ------------------------------
+      {
+        name: AUTH_SERVICE_NAME,
+        transport: Transport.GRPC,
+        options: {
+          url: process.env.AUTH_SERVICE_URL || 'localhost:50051',
+          package: AUTH_PACKAGE_NAME,
+          protoPath: join(__dirname, '../proto/auth.proto'),
+        },
+      },
 
-         // Register the user service client------------------
+      // Register the user service client------------------
       {
         name: USER_SERVICE_NAME,
         transport: Transport.GRPC,
         options: {
           url: process.env.USER_SERVICE_URL || 'localhost:50052',
           package: USER_PACKAGE_NAME,
-          protoPath: join(__dirname, '../../proto/user.proto'),
+          protoPath: join(__dirname, '../proto/user.proto'),
         },
       },
-     
+
       // Register the delivery service client------------------------
       {
         name: 'DELIVERY_SERVICE',
         transport: Transport.GRPC,
         options: {
-          url: process.env.DELIVERY_SERVICE_URL || 'localhost:50053',
+          url: process.env.DELIVERY_SERVICE_URL || 'delivery-service:50053',
           package: 'delivery',
-          protoPath: join(__dirname, '../../proto/delivery.proto'),
+          protoPath: join(__dirname, '../proto/delivery.proto'),
         },
       },
       // Register the notification service client-------------------------
@@ -44,9 +57,9 @@ import { USER_PACKAGE_NAME, USER_SERVICE_NAME } from './user/types';
         name: 'NOTIFICATION_SERVICE',
         transport: Transport.GRPC,
         options: {
-          url: process.env.NOTIFICATION_SERVICE_URL || 'localhost:50054',
+          url: process.env.NOTIFICATION_SERVICE_URL || 'notification-service:50054',
           package: 'notification',
-          protoPath: join(__dirname, '../../proto/notification.proto'),
+          protoPath: join(__dirname, '../proto/notification.proto'),
         },
       },
       // Register the order service client-------------------------
@@ -54,19 +67,19 @@ import { USER_PACKAGE_NAME, USER_SERVICE_NAME } from './user/types';
         name: 'ORDER_SERVICE',
         transport: Transport.GRPC,
         options: {
-          url: process.env.ORDER_SERVICE_URL || 'localhost:50055',
+          url: process.env.ORDER_SERVICE_URL || 'order-service:50055',
           package: 'order',
-          protoPath: join(__dirname, '../../proto/order.proto'),
+          protoPath: join(__dirname, '../proto/order.proto'),
         },
       },
-       // Register the payment service client--------------------------
-       {
+      // Register the payment service client--------------------------
+      {
         name: 'PAYMENT_SERVICE',
         transport: Transport.GRPC,
         options: {
-          url: process.env.PAYMENT_SERVICE_URL || 'localhost:50056',
+          url: process.env.PAYMENT_SERVICE_URL || 'payment-service:50056',
           package: 'payment',
-          protoPath: join(__dirname, '../../proto/payment.proto'),
+          protoPath: join(__dirname, '../proto/payment.proto'),
         },
       },
       // Register the restaurant service client---------------------
@@ -74,20 +87,14 @@ import { USER_PACKAGE_NAME, USER_SERVICE_NAME } from './user/types';
         name: 'RESTAURANT_SERVICE',
         transport: Transport.GRPC,
         options: {
-          url: process.env.RESTAURANT_SERVICE_URL || 'localhost:50057',
+          url: process.env.RESTAURANT_SERVICE_URL || 'restaurant-service:50057',
           package: 'restaurant',
-          protoPath: join(__dirname, '../../proto/restaurant.proto'),
+          protoPath: join(__dirname, '../proto/restaurant.proto'),
         },
       },
-      
-
     ]),
   ],
-  controllers: [
-    UserController,
-  ],
-  providers: [
-    UserService
-  ],
+  controllers: [UserController, AuthController, AppController],
+  providers: [AuthService, UserService],
 })
 export class AppModule {}

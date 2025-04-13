@@ -1,11 +1,16 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
-  "entryFile": "main",
+  "sourceRoot": "./",
+  "entryFile": "src/main",
   "compilerOptions": {
     "deleteOutDir": true,
-    "assets": ["proto/*.proto"],
+    "assets": [
+      {
+        "include": "proto/*.proto",
+        "outDir": "dist/proto"
+      }
+    ],
     "watchAssets": true
   }
 }

@@ -2,7 +2,7 @@
 // versions:
 //   protoc-gen-ts_proto  v2.7.0
 //   protoc               v6.30.2
-// source: user.proto
+// source: proto/user.proto
 
 /* eslint-disable */
 import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
@@ -14,63 +14,87 @@ export interface Empty {
 }
 
 export interface UserList {
-  users: User[];
+  users: UserResponse[];
 }
 
 export interface FineOneUserDto {
   id: string;
 }
 
+export interface VerifyOneUserDto {
+  isVerified: string;
+}
+
 export interface CreateUserDto {
-  id: string;
-  name: string;
+  fullName: string;
   email: string;
-  password: string;
+  phoneNumber: string;
+  passwordHash: string;
+  /** 'customer', 'delivery_personnel', 'restaurant' */
+  role: string;
+  /** 'pending', 'verified', 'rejected' */
+  isVerified: string;
 }
 
 export interface UpdateUserDto {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
+  userId: string;
+  fullName: string;
+  phoneNumber: string;
+  role: string;
+  isVerified: string;
 }
 
-export interface User {
-  id: string;
-  name: string;
+export interface UserResponse {
+  userId: string;
+  fullName: string;
   email: string;
-  password: string;
+  phoneNumber: string;
+  role: string;
+  isVerified: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export const USER_PACKAGE_NAME = "user";
 
 export interface UserServiceClient {
-  createUser(request: CreateUserDto): Observable<User>;
+  createUser(request: CreateUserDto): Observable<UserResponse>;
 
   findAllUsers(request: Empty): Observable<UserList>;
 
-  findUserById(request: FineOneUserDto): Observable<User>;
+  findUserById(request: FineOneUserDto): Observable<UserResponse>;
 
-  updateUser(request: UpdateUserDto): Observable<User>;
+  updateUser(request: UpdateUserDto): Observable<UserResponse>;
 
-  deleteUser(request: FineOneUserDto): Observable<User>;
+  deleteUser(request: FineOneUserDto): Observable<UserResponse>;
+
+  verifyUser(request: FineOneUserDto): Observable<UserResponse>;
 }
 
 export interface UserServiceController {
-  createUser(request: CreateUserDto): Promise<User> | Observable<User> | User;
+  createUser(request: CreateUserDto): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
 
   findAllUsers(request: Empty): Promise<UserList> | Observable<UserList> | UserList;
 
-  findUserById(request: FineOneUserDto): Promise<User> | Observable<User> | User;
+  findUserById(request: FineOneUserDto): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
 
-  updateUser(request: UpdateUserDto): Promise<User> | Observable<User> | User;
+  updateUser(request: UpdateUserDto): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
 
-  deleteUser(request: FineOneUserDto): Promise<User> | Observable<User> | User;
+  deleteUser(request: FineOneUserDto): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
+
+  verifyUser(request: FineOneUserDto): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
 }
 
 export function UserServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["createUser", "findAllUsers", "findUserById", "updateUser", "deleteUser"];
+    const grpcMethods: string[] = [
+      "createUser",
+      "findAllUsers",
+      "findUserById",
+      "updateUser",
+      "deleteUser",
+      "verifyUser",
+    ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("UserService", method)(constructor.prototype[method], method, descriptor);
