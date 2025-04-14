@@ -5,10 +5,10 @@
 // source: proto/auth.proto
 
 /* eslint-disable */
-import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
-import { Observable } from "rxjs";
+import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
 
-export const protobufPackage = "auth";
+export const protobufPackage = 'auth';
 
 export interface SignUpRequest {
   fullName: string;
@@ -31,6 +31,7 @@ export interface User {
   email: string;
   phoneNumber: string;
   role: string;
+  isVerified: string;
 }
 
 export interface SignInRequest {
@@ -51,6 +52,7 @@ export interface VerifyTokenResponse {
 }
 
 export interface LogoutRequest {
+  userId: string;
   refreshToken: string;
 }
 
@@ -78,7 +80,7 @@ export interface ForgotPasswordResponse {
   message: string;
 }
 
-export const AUTH_PACKAGE_NAME = "auth";
+export const AUTH_PACKAGE_NAME = 'auth';
 
 export interface AuthServiceClient {
   signUp(request: SignUpRequest): Observable<AuthResponse>;
@@ -121,24 +123,24 @@ export interface AuthServiceController {
 export function AuthServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
-      "signUp",
-      "signIn",
-      "refreshToken",
-      "verifyToken",
-      "logout",
-      "changePassword",
-      "forgotPassword",
+      'signUp',
+      'signIn',
+      'refreshToken',
+      'verifyToken',
+      'logout',
+      'changePassword',
+      'forgotPassword',
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod("AuthService", method)(constructor.prototype[method], method, descriptor);
+      GrpcMethod('AuthService', method)(constructor.prototype[method], method, descriptor);
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod("AuthService", method)(constructor.prototype[method], method, descriptor);
+      GrpcStreamMethod('AuthService', method)(constructor.prototype[method], method, descriptor);
     }
   };
 }
 
-export const AUTH_SERVICE_NAME = "AuthService";
+export const AUTH_SERVICE_NAME = 'AuthService';

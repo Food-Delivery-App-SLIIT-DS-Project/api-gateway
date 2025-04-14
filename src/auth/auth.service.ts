@@ -1,8 +1,16 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { ClientGrpc } from '@nestjs/microservices';
 import { Inject, Injectable, OnModuleInit, UnauthorizedException } from '@nestjs/common';
-import { AUTH_SERVICE_NAME, AuthResponse, AuthServiceClient, SignInRequest } from './types';
+import {
+  AUTH_SERVICE_NAME,
+  AuthResponse,
+  AuthServiceClient,
+  LogoutRequest,
+  LogoutResponse,
+  SignInRequest,
+} from './types';
 import { SignupDto } from './dto/sign-up.dto';
 import { lastValueFrom } from 'rxjs';
 
@@ -25,6 +33,18 @@ export class AuthService implements OnModuleInit {
     } catch (error) {
       console.error('gRPC SignIn Error:', error);
       throw new UnauthorizedException('Invalid email or password');
+    }
+  }
+
+  async logout(refreshToken: string, userId:string): Promise<{ message: string }> {
+    console.log('logout function', refreshToken, userId);
+    try {
+      const request: LogoutRequest = { refreshToken ,userId };
+      const response: LogoutResponse = await lastValueFrom(this.authServiceClient.logout(request));
+      return { message: response?.success ? 'Logout successful' : 'Logout failed' };
+    } catch (error) {
+      console.error('gRPC Logout Error:', error);
+      throw new UnauthorizedException('Logout failed');
     }
   }
 }

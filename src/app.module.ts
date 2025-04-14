@@ -13,11 +13,11 @@ import { AppController } from './app.controller';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { AUTH_PACKAGE_NAME, AUTH_SERVICE_NAME } from './auth/types';
+import { JwtStrategy } from './auth/strategy/JwtStrategy';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-
     // Register microservices (gRPC clients)
     ClientsModule.register([
       // auth service ------------------------------
@@ -95,6 +95,7 @@ import { AUTH_PACKAGE_NAME, AUTH_SERVICE_NAME } from './auth/types';
     ]),
   ],
   controllers: [UserController, AuthController, AppController],
-  providers: [AuthService, UserService],
+  providers: [UserService, JwtStrategy, AuthService],
+  exports: [AuthService],
 })
 export class AppModule {}
