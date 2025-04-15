@@ -25,7 +25,7 @@ import { JwtStrategy } from './auth/strategy/JwtStrategy';
         name: AUTH_SERVICE_NAME,
         transport: Transport.GRPC,
         options: {
-          url: process.env.AUTH_SERVICE_URL || 'auth-service:50051',
+          url: process.env.AUTH_SERVICE_URL || 'localhost:50051',
           package: AUTH_PACKAGE_NAME,
           protoPath: join(__dirname, '../proto/auth.proto'),
         },
@@ -36,7 +36,7 @@ import { JwtStrategy } from './auth/strategy/JwtStrategy';
         name: USER_SERVICE_NAME,
         transport: Transport.GRPC,
         options: {
-          url: process.env.USER_SERVICE_URL || 'user-service:50052',
+          url: process.env.USER_SERVICE_URL || 'localhost:50052',
           package: USER_PACKAGE_NAME,
           protoPath: join(__dirname, '../proto/user.proto'),
         },

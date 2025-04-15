@@ -4,6 +4,7 @@ export enum UserRole {
   CUSTOMER = 'customer',
   ADMIN = 'admin',
   DELIVERY_PERSONNEL = 'delivery_personnel',
+  RESTAURANT = 'restaurant',
 }
 
 export enum VerificationStatus {
