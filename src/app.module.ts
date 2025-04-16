@@ -14,13 +14,17 @@ import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { AUTH_PACKAGE_NAME, AUTH_SERVICE_NAME } from './auth/types';
 import { JwtStrategy } from './auth/strategy/JwtStrategy';
+import { RestaurantService } from './restaurant/restaurant.service';
+import { RestaurantController } from './restaurant/restaurant.controller';
+import { RESTAURANT_PACKAGE_NAME, RESTAURANT_SERVICE_NAME } from './restaurant/types/restaurant';
+import { RestaurantModule } from './restaurant/restaurant.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    // Register microservices (gRPC clients)
+
     ClientsModule.register([
-      // auth service ------------------------------
+      // Only include services NOT already registered in feature modules like RestaurantModule
       {
         name: AUTH_SERVICE_NAME,
         transport: Transport.GRPC,
@@ -30,8 +34,6 @@ import { JwtStrategy } from './auth/strategy/JwtStrategy';
           protoPath: join(__dirname, '../proto/auth.proto'),
         },
       },
-
-      // Register the user service client------------------
       {
         name: USER_SERVICE_NAME,
         transport: Transport.GRPC,
@@ -41,8 +43,6 @@ import { JwtStrategy } from './auth/strategy/JwtStrategy';
           protoPath: join(__dirname, '../proto/user.proto'),
         },
       },
-
-      // Register the delivery service client------------------------
       {
         name: 'DELIVERY_SERVICE',
         transport: Transport.GRPC,
@@ -52,7 +52,6 @@ import { JwtStrategy } from './auth/strategy/JwtStrategy';
           protoPath: join(__dirname, '../proto/delivery.proto'),
         },
       },
-      // Register the notification service client-------------------------
       {
         name: 'NOTIFICATION_SERVICE',
         transport: Transport.GRPC,
@@ -62,7 +61,6 @@ import { JwtStrategy } from './auth/strategy/JwtStrategy';
           protoPath: join(__dirname, '../proto/notification.proto'),
         },
       },
-      // Register the order service client-------------------------
       {
         name: 'ORDER_SERVICE',
         transport: Transport.GRPC,
@@ -72,7 +70,6 @@ import { JwtStrategy } from './auth/strategy/JwtStrategy';
           protoPath: join(__dirname, '../proto/order.proto'),
         },
       },
-      // Register the payment service client--------------------------
       {
         name: 'PAYMENT_SERVICE',
         transport: Transport.GRPC,
@@ -82,20 +79,20 @@ import { JwtStrategy } from './auth/strategy/JwtStrategy';
           protoPath: join(__dirname, '../proto/payment.proto'),
         },
       },
-      // Register the restaurant service client---------------------
       {
-        name: 'RESTAURANT_SERVICE',
+        name: RESTAURANT_SERVICE_NAME,
         transport: Transport.GRPC,
         options: {
-          url: process.env.RESTAURANT_SERVICE_URL || 'restaurant-service:50057',
-          package: 'restaurant',
-          protoPath: join(__dirname, '../proto/restaurant.proto'),
+          url: process.env.RESTAURANT_SERVICE_URL || 'localhost:50057',
+          package: RESTAURANT_PACKAGE_NAME,
+          protoPath: join(__dirname, '../proto/restaurant.proto'), // adjust path as needed
         },
       },
+      RestaurantModule,
     ]),
   ],
-  controllers: [UserController, AuthController, AppController],
-  providers: [UserService, JwtStrategy, AuthService],
+  controllers: [UserController, AuthController, AppController, RestaurantController],
+  providers: [UserService, JwtStrategy, AuthService, RestaurantService],
   exports: [AuthService],
 })
 export class AppModule {}

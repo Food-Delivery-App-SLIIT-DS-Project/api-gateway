@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Param, Put, Delete, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, Patch, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UserList, UserResponse } from './types';
 import { VerifyOneUserDto } from './dto/verifyUser.dto';
 import { FindAllUserByIsVerifiedDto } from './dto/findAllUserByIsVerified.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -22,6 +24,7 @@ export class UserController {
 
   // get all users
   @Get()
+  @UseGuards(JwtAuthGuard)
   async findAllUsers(): Promise<UserList> {
     console.log('getAllUsers');
     return this.userService.findAllUsers();

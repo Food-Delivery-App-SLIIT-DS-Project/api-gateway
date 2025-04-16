@@ -1,8 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { RestaurantService } from './restaurant.service';
-import { CreateRestaurantDto } from './dto/create-restaurant.dto';
-import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
+import { CreateRestaurantDto, UpdateRestaurantDto } from './types/restaurant';
 
 @Controller('restaurant')
 export class RestaurantController {
@@ -10,26 +9,26 @@ export class RestaurantController {
 
   @Post()
   create(@Body() createRestaurantDto: CreateRestaurantDto) {
-    return this.restaurantService.create(createRestaurantDto);
+    return this.restaurantService.createRestaurant(createRestaurantDto);
   }
 
   @Get()
   findAll() {
-    return this.restaurantService.findAll();
+    return this.restaurantService.findAllRestaurants({});
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.restaurantService.findOne(+id);
+    return this.restaurantService.findRestaurantById({ id });
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRestaurantDto: UpdateRestaurantDto) {
-    return this.restaurantService.update(+id, updateRestaurantDto);
+  update(@Body() updateRestaurantDto: UpdateRestaurantDto) {
+    return this.restaurantService.updateRestaurant(updateRestaurantDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.restaurantService.remove(+id);
+    return this.restaurantService.deleteRestaurant({ id });
   }
 }
