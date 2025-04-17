@@ -1,26 +1,16 @@
-import { Injectable } from '@nestjs/common';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { CreateOrderRequest, ORDER_SERVICE_NAME, OrderServiceClient } from './types/order';
+import { ClientGrpc } from '@nestjs/microservices';
 
 @Injectable()
-export class OrderService {
-  create(createOrderDto: CreateOrderDto) {
-    return 'This action adds a new order';
+export class OrderService implements OnModuleInit {
+  private orderServiceClient: OrderServiceClient;
+  constructor(@Inject(ORDER_SERVICE_NAME) private readonly client: ClientGrpc) {}
+  onModuleInit() {
+    this.orderServiceClient = this.client.getService<OrderServiceClient>(ORDER_SERVICE_NAME);
   }
-
-  findAll() {
-    return `This action returns all order`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
-  }
-
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  placeOrder(createOrderDto: CreateOrderRequest) {
+    // Logic to place an order
+    return this.orderServiceClient.placeOrder(createOrderDto);
   }
 }

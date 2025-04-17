@@ -17,7 +17,10 @@ import { JwtStrategy } from './auth/strategy/JwtStrategy';
 import { RestaurantService } from './restaurant/restaurant.service';
 import { RestaurantController } from './restaurant/restaurant.controller';
 import { RESTAURANT_PACKAGE_NAME, RESTAURANT_SERVICE_NAME } from './restaurant/types/restaurant';
-import { RestaurantModule } from './restaurant/restaurant.module';
+
+import { ORDER_PACKAGE_NAME, ORDER_SERVICE_NAME } from './order/types/order';
+import { OrderController } from './order/order.controller';
+import { OrderService } from './order/order.service';
 
 @Module({
   imports: [
@@ -62,11 +65,11 @@ import { RestaurantModule } from './restaurant/restaurant.module';
         },
       },
       {
-        name: 'ORDER_SERVICE',
+        name: ORDER_SERVICE_NAME,
         transport: Transport.GRPC,
         options: {
-          url: process.env.ORDER_SERVICE_URL || 'order-service:50055',
-          package: 'order',
+          url: process.env.ORDER_SERVICE_URL || 'localhost:50055',
+          package: ORDER_PACKAGE_NAME,
           protoPath: join(__dirname, '../proto/order.proto'),
         },
       },
@@ -88,11 +91,12 @@ import { RestaurantModule } from './restaurant/restaurant.module';
           protoPath: join(__dirname, '../proto/restaurant.proto'), // adjust path as needed
         },
       },
-      RestaurantModule,
     ]),
+    // RestaurantModule,
+    // OrderModule,
   ],
-  controllers: [UserController, AuthController, AppController, RestaurantController],
-  providers: [UserService, JwtStrategy, AuthService, RestaurantService],
+  controllers: [UserController, AuthController, AppController, RestaurantController, OrderController],
+  providers: [UserService, JwtStrategy, AuthService, RestaurantService, OrderService],
   exports: [AuthService],
 })
 export class AppModule {}
