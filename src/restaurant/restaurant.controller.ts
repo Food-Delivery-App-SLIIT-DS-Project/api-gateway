@@ -11,6 +11,30 @@ import { catchError, lastValueFrom, throwError } from 'rxjs';
 export class RestaurantController {
   constructor(private readonly restaurantService: RestaurantService) {}
 
+  @Post('accept-order')
+  async acceptOrder(@Body() orderAcceptedDto: { orderId: string; restaurantId: string; location: { lat: string; lng: string } }) {
+    try {
+      console.log("Accepting order with DTO:", orderAcceptedDto);
+      const response = await lastValueFrom(this.restaurantService.restaurantAcceptOrder(orderAcceptedDto));
+      return {
+        code: '200',
+        message: 'success',
+        data: {
+          status: response.status,
+        },
+      };
+    } catch (err) {
+      console.error('Error accepting order:', err);
+      throw new HttpException(
+        {
+          code: '500',
+          message: 'Internal server error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   @Post()
   async create(@Body() createRestaurantDto: CreateRestaurantDto) {
     try {

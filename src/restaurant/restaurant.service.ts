@@ -5,6 +5,8 @@ import {
   DeleteResponse,
   Empty,
   FindOneDto,
+  OrderAcceptedDto,
+  OrderAcceptedResponse,
   RESTAURANT_SERVICE_NAME,
   RestaurantList,
   RestaurantResponse,
@@ -21,6 +23,11 @@ export class RestaurantService implements OnModuleInit {
   onModuleInit() {
     this.restaurantServiceClient = this.client.getService<RestaurantServiceClient>(RESTAURANT_SERVICE_NAME);
   }
+  // ----------- Restaurant Service -----------
+  restaurantAcceptOrder(request: OrderAcceptedDto): Observable<OrderAcceptedResponse> {
+    return this.restaurantServiceClient.restaurantAcceptOrder(request);
+  }
+  // ----------- Restaurant Service -----------
   createRestaurant(request: CreateRestaurantDto) {
     return this.restaurantServiceClient.createRestaurant(request);
   }
