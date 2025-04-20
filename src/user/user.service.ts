@@ -14,6 +14,7 @@ import {
   UserResponse,
   VerifyOneUserDto,
   Status,
+  FcmTokenResponse,
 } from './types';
 import { lastValueFrom } from 'rxjs';
 import { status } from '@grpc/grpc-js';
@@ -27,6 +28,14 @@ export class UserService implements OnModuleInit {
   onModuleInit() {
     this.userServiceClient = this.client.getService<UserServiceClient>(USER_SERVICE_NAME);
   }
+
+  // get fcm token by userId -----------------------
+  async findFcmTokenByUserId(data: FineOneUserDto): Promise<FcmTokenResponse> {
+    console.log('findFcmTokenByUserId', data);
+    const result = this.userServiceClient.findFcmTokenByUserId(data);
+    return lastValueFrom(result);
+  }
+
 
   // create user -------------------
   async createUser(data: CreateUserDto): Promise<UserResponse> {

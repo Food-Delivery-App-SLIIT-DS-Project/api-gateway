@@ -1,10 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Param, Put, Delete, Patch, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  Delete,
+  Patch,
+  UseGuards,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/createUser.dto';
-import { UserList, UserResponse } from './types';
+import { FcmTokenResponse, FineOneUserDto, UserList, UserResponse } from './types';
 import { VerifyOneUserDto } from './dto/verifyUser.dto';
 import { FindAllUserByIsVerifiedDto } from './dto/findAllUserByIsVerified.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
@@ -22,6 +34,28 @@ export class UserController {
   //   return this.userService.createUser(data);
   // }
 
+  // get fcm token by userid
+  @Get('fcm-token')
+  async findFcmTokenByUserId(@Body() data: FineOneUserDto): Promise<FcmTokenResponse> {
+    try {
+      const result = await this.userService.findFcmTokenByUserId(data);
+
+      if (!result) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+
+      return result;
+    } catch (error: any) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (error.code === 5 || error.message?.includes('FcmToken not found')) {
+        // gRPC NOT_FOUND error
+        throw new HttpException('FCM token not found for user', HttpStatus.NOT_FOUND);
+      }
+
+      // Any other unexpected errors
+      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
   // get all users
   @Get()
   @UseGuards(JwtAuthGuard)
@@ -29,7 +63,7 @@ export class UserController {
     console.log('getAllUsers');
     return this.userService.findAllUsers();
   }
-  
+
   // Verify a user
   @Patch('verify')
   async verifyUser(@Body() data: VerifyOneUserDto): Promise<UserResponse> {
@@ -82,7 +116,7 @@ export class UserController {
 
   // Find a user by ID
   @Get(':id')
-  findOneUser(@Param('id') user_id: string):Promise <UserResponse> {
+  findOneUser(@Param('id') user_id: string): Promise<UserResponse> {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     return this.userService.findUserById({ userId: user_id });
   }

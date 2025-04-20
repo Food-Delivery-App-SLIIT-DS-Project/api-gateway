@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 export enum UserRole {
   CUSTOMER = 'customer',
@@ -22,6 +22,6 @@ export class UpdateUserDto {
   role: UserRole;
 
   @IsNotEmpty()
-  @IsString()
-  isVerified: string;
+  @IsBoolean()
+  isVerified: boolean;
 }

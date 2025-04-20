@@ -1,9 +1,11 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsBoolean } from 'class-validator';
 
 class VerifyOneUserDto {
   @IsNotEmpty()
   userId: string;
+
   @IsNotEmpty()
-  isVerified: string;
+  @IsBoolean()
+  isVerified: boolean;
 }
 export { VerifyOneUserDto };

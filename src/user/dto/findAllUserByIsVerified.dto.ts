@@ -1,8 +1,8 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty } from 'class-validator';
 
 class FindAllUserByIsVerifiedDto {
-  @IsString()
+  @IsBoolean()
   @IsNotEmpty()
-  status: string;
+  status: boolean;
 }
 export { FindAllUserByIsVerifiedDto };

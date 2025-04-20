@@ -24,7 +24,7 @@ export class AuthController {
       data: {
         // eslint-disable-next-line prettier/prettier
         role: (result.user?.role as Role) ?? ('customer' as Role),
-        user: result.user as User,
+        user: result.user as unknown as User,
         token: {
           access: result.accessToken,
           refresh: result.refreshToken,
@@ -37,14 +37,17 @@ export class AuthController {
   @Post('signin')
   async signIn(@Body() signInDto: SignInDto): Promise<ApiResponse<AuthData>> {
     console.log('signupDto', signInDto);
-    const result = await this.authService.signIn(signInDto);
+    const result = await this.authService.signIn({
+      ...signInDto,
+      fcmToken: signInDto.fcmToken ?? undefined,
+    });
     return {
       code: 0,
       msg: '',
       data: {
         // eslint-disable-next-line prettier/prettier
         role: (result.user?.role as Role) ?? ('customer' as Role),
-        user: result.user as User,
+        user: result.user as unknown as User,
         token: {
           access: result.accessToken,
           refresh: result.refreshToken,

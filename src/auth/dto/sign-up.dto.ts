@@ -1,16 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-import { IsEmail, IsEnum, IsNotEmpty, IsPhoneNumber, IsString } from 'class-validator';
+import { IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsPhoneNumber, IsString } from 'class-validator';
+
 export enum UserRole {
   CUSTOMER = 'customer',
   ADMIN = 'admin',
   DELIVERY_PERSONNEL = 'delivery_personnel',
   RESTAURANT = 'restaurant',
-}
-
-export enum VerificationStatus {
-  VERIFIED = 'verified',
-  UNVERIFIED = 'pending',
-  REJECTED = 'rejected',
 }
 
 export class SignupDto {
@@ -27,10 +21,14 @@ export class SignupDto {
   @IsEnum(UserRole)
   role: UserRole;
 
-  @IsEnum(VerificationStatus)
-  isVerified: VerificationStatus;
+  @IsBoolean()
+  isVerified: boolean;
 
   @IsString()
   @IsNotEmpty()
   password: string;
+
+  @IsOptional()
+  @IsString()
+  fcmToken?: string;
 }
