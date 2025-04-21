@@ -1,35 +1,60 @@
-/* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { PaymentService } from './payment.service';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Inject,
+  OnModuleInit,
+} from '@nestjs/common';
+import { ClientGrpc } from '@nestjs/microservices';
+import { lastValueFrom } from 'rxjs';
 import { CreatePaymentDto } from './dto/create-payment.dto';
-import { UpdatePaymentDto } from './dto/update-payment.dto';
+
+interface PaymentServiceGrpc {
+  CreatePayment(data: CreatePaymentRequest): any;
+  GetPayment(data: { paymentId: string }): any;
+  RefundPayment(data: { paymentId: string }): any;
+}
+
+interface CreatePaymentRequest {
+  orderId: string;
+  customerId: string;
+  amount: number;
+  paymentMethod: string;
+  transactionId?: string;
+}
 
 @Controller('payment')
-export class PaymentController {
-  constructor(private readonly paymentService: PaymentService) {}
+export class PaymentController implements OnModuleInit {
+  private paymentService: PaymentServiceGrpc;
 
-  @Post()
-  create(@Body() createPaymentDto: CreatePaymentDto) {
-    return this.paymentService.create(createPaymentDto);
+  constructor(@Inject('PAYMENT_SERVICE') private readonly client: ClientGrpc) {}
+
+  onModuleInit() {
+    this.paymentService = this.client.getService<PaymentServiceGrpc>('PaymentService');
   }
 
-  @Get()
-  findAll() {
-    return this.paymentService.findAll();
+  @Post()
+  async createPayment(@Body() createPaymentDto: CreatePaymentDto) {
+    const createPaymentRequest: CreatePaymentRequest = {
+      orderId: createPaymentDto.orderId,
+      customerId: createPaymentDto.customerId,
+      amount: createPaymentDto.amount,
+      paymentMethod: createPaymentDto.paymentMethod,
+      transactionId: createPaymentDto.transactionId,
+    };
+    console.log('createPaymentRequest', createPaymentRequest);
+    return this.paymentService.CreatePayment(createPaymentRequest);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.paymentService.findOne(+id);
+  async getPayment(@Param('id') paymentId: string) {
+    return this.paymentService.GetPayment({ paymentId });
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePaymentDto: UpdatePaymentDto) {
-    return this.paymentService.update(+id, updatePaymentDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.paymentService.remove(+id);
+  @Post('refund/:id')
+  async refundPayment(@Param('id') paymentId: string) {
+    return this.paymentService.RefundPayment({ paymentId });
   }
 }
