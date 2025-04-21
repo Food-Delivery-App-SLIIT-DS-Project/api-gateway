@@ -14,6 +14,7 @@ import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { AUTH_PACKAGE_NAME, AUTH_SERVICE_NAME } from './auth/types';
 import { JwtStrategy } from './auth/strategy/JwtStrategy';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -93,6 +94,7 @@ import { JwtStrategy } from './auth/strategy/JwtStrategy';
         },
       },
     ]),
+    OrderModule,
   ],
   controllers: [UserController, AuthController, AppController],
   providers: [UserService, JwtStrategy, AuthService],
