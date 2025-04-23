@@ -92,8 +92,6 @@ import { OrderService } from './order/order.service';
         },
       },
     ]),
-    // RestaurantModule,
-    // OrderModule,
   ],
   controllers: [UserController, AuthController, AppController, RestaurantController, OrderController],
   providers: [UserService, JwtStrategy, AuthService, RestaurantService, OrderService],
