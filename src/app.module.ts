@@ -77,7 +77,7 @@ import { OrderService } from './order/order.service';
         name: 'PAYMENT_SERVICE',
         transport: Transport.GRPC,
         options: {
-          url: process.env.PAYMENT_SERVICE_URL || 'payment-service:50056',
+          url: process.env.PAYMENT_SERVICE_URL || 'localhost:50056',
           package: 'payment',
           protoPath: join(__dirname, '../proto/payment.proto'),
         },
