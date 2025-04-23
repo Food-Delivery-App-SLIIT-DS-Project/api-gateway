@@ -34,7 +34,7 @@ import { PaymentService } from './payment/payment.service';
         name: AUTH_SERVICE_NAME,
         transport: Transport.GRPC,
         options: {
-          url: process.env.AUTH_SERVICE_URL || 'localhost:50051',
+          url: process.env.AUTH_SERVICE_URL || '0.0.0.0:50051',
           package: AUTH_PACKAGE_NAME,
           protoPath: join(__dirname, '../proto/auth.proto'),
         },
@@ -43,7 +43,7 @@ import { PaymentService } from './payment/payment.service';
         name: USER_SERVICE_NAME,
         transport: Transport.GRPC,
         options: {
-          url: process.env.USER_SERVICE_URL || 'localhost:50052',
+          url: process.env.USER_SERVICE_URL || '0.0.0.0:50052',
           package: USER_PACKAGE_NAME,
           protoPath: join(__dirname, '../proto/user.proto'),
         },
@@ -70,7 +70,7 @@ import { PaymentService } from './payment/payment.service';
         name: ORDER_SERVICE_NAME,
         transport: Transport.GRPC,
         options: {
-          url: process.env.ORDER_SERVICE_URL || 'localhost:50055',
+          url: process.env.ORDER_SERVICE_URL || '0.0.0.0:50055',
           package: ORDER_PACKAGE_NAME,
           protoPath: join(__dirname, '../proto/order.proto'),
         },

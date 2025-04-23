@@ -8,16 +8,7 @@ service OrderService {
   rpc FindOneOrder (OrderId) returns (OrderResponse);
   rpc UpdateOrderStatus (UpdateStatusRequest) returns (OrderResponse);
   rpc RemoveOrder (OrderId) returns (RemoveResponse);
-  rpc PlaceOrder (CreateOrderRequest) returns (OrderResponse);
 }
-message User {
-    string fullName = 1;
-    string email = 2;
-    string phoneNumber = 3;
-  }
-  
- 
-
 
 message Empty {}
 
@@ -39,9 +30,9 @@ message OrderItemInput {
 message CreateOrderRequest {
   string customerId = 1;
   string restaurantId = 2;
-  string deliveryId = 3;
-  string status = 4;
-  double totalPrice = 5;
+  string deliveryId  = 3;
+    optional string status = 4;
+    double totalPrice = 5;
   repeated OrderItemInput items = 6;
 }
 
