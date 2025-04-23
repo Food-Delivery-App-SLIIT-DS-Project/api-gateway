@@ -1,11 +1,9 @@
-import { IsUUID, IsNumber, IsString, IsNotEmpty } from 'class-validator';
+import { IsNumber, IsString, IsNotEmpty } from 'class-validator';
 
 export class CreatePaymentDto {
-  @IsUUID()
   @IsNotEmpty()
   orderId: string;
 
-  @IsUUID()
   @IsNotEmpty()
   customerId: string;
 
@@ -20,4 +18,3 @@ export class CreatePaymentDto {
   @IsNotEmpty()
   transactionId: string;
 }
-

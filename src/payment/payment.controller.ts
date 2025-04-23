@@ -1,60 +1,68 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Post,
-  Body,
-  Inject,
-  OnModuleInit,
-} from '@nestjs/common';
-import { ClientGrpc } from '@nestjs/microservices';
-import { lastValueFrom } from 'rxjs';
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+
+import { Controller, Get, Param, Post, Body } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
-
-interface PaymentServiceGrpc {
-  CreatePayment(data: CreatePaymentRequest): any;
-  GetPayment(data: { paymentId: string }): any;
-  RefundPayment(data: { paymentId: string }): any;
-}
-
-interface CreatePaymentRequest {
-  orderId: string;
-  customerId: string;
-  amount: number;
-  paymentMethod: string;
-  transactionId?: string;
-}
+import { PaymentService } from './payment.service';
+import { status } from '@grpc/grpc-js';
+import { firstValueFrom } from 'rxjs';
 
 @Controller('payment')
-export class PaymentController implements OnModuleInit {
-  private paymentService: PaymentServiceGrpc;
-
-  constructor(@Inject('PAYMENT_SERVICE') private readonly client: ClientGrpc) {}
-
-  onModuleInit() {
-    this.paymentService = this.client.getService<PaymentServiceGrpc>('PaymentService');
-  }
+export class PaymentController {
+  constructor(private readonly paymentService: PaymentService) {}
 
   @Post()
   async createPayment(@Body() createPaymentDto: CreatePaymentDto) {
-    const createPaymentRequest: CreatePaymentRequest = {
-      orderId: createPaymentDto.orderId,
-      customerId: createPaymentDto.customerId,
-      amount: createPaymentDto.amount,
-      paymentMethod: createPaymentDto.paymentMethod,
-      transactionId: createPaymentDto.transactionId,
-    };
-    console.log('createPaymentRequest', createPaymentRequest);
-    return this.paymentService.CreatePayment(createPaymentRequest);
+    try {
+      const result = await firstValueFrom(this.paymentService.create(createPaymentDto));
+      return {
+        code: 0,
+        msg: 'Payment created successfully',
+        data: result,
+      };
+    } catch (error) {
+      return this.handleGrpcError(error);
+    }
   }
 
   @Get(':id')
   async getPayment(@Param('id') paymentId: string) {
-    return this.paymentService.GetPayment({ paymentId });
+    try {
+      const result = await firstValueFrom(this.paymentService.getPayment(paymentId));
+      return {
+        code: 0,
+        msg: 'Payment fetched successfully',
+        data: result,
+      };
+    } catch (error) {
+      return this.handleGrpcError(error);
+    }
   }
 
   @Post('refund/:id')
   async refundPayment(@Param('id') paymentId: string) {
-    return this.paymentService.RefundPayment({ paymentId });
+    try {
+      const result = await firstValueFrom(this.paymentService.refundPayment(paymentId));
+      return {
+        code: 0,
+        msg: 'Payment refunded successfully',
+        data: result,
+      };
+    } catch (error) {
+      return this.handleGrpcError(error);
+    }
+  }
+
+  private handleGrpcError(error: any) {
+    const code = error.code || status.UNKNOWN;
+    const msg = error.message || 'Something went wrong';
+    return {
+      code,
+      msg,
+      data: null,
+    };
   }
 }

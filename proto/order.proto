@@ -8,7 +8,7 @@ service OrderService {
   rpc FindOneOrder (OrderId) returns (OrderResponse);
   rpc UpdateOrderStatus (UpdateStatusRequest) returns (OrderResponse);
   rpc RemoveOrder (OrderId) returns (RemoveResponse);
-    rpc PlaceOrder (CreateOrderRequest) returns (OrderResponse);
+  rpc PlaceOrder (CreateOrderRequest) returns (OrderResponse);
 }
 message User {
     string fullName = 1;
@@ -16,17 +16,8 @@ message User {
     string phoneNumber = 3;
   }
   
-  message CreateOrderRequest {
-    User user = 1;
-    string orderId = 2;
-    string deliveryEstimate = 3;
-  }
-  
-  message OrderResponse {
-    string orderId = 1;
-    string status = 2;
-    string estimatedDelivery = 3;
-  }
+ 
+
 
 message Empty {}
 

@@ -21,6 +21,8 @@ import { RESTAURANT_PACKAGE_NAME, RESTAURANT_SERVICE_NAME } from './restaurant/t
 import { ORDER_PACKAGE_NAME, ORDER_SERVICE_NAME } from './order/types/order';
 import { OrderController } from './order/order.controller';
 import { OrderService } from './order/order.service';
+import { PaymentController } from './payment/payment.controller';
+import { PaymentService } from './payment/payment.service';
 
 @Module({
   imports: [
@@ -77,7 +79,7 @@ import { OrderService } from './order/order.service';
         name: 'PAYMENT_SERVICE',
         transport: Transport.GRPC,
         options: {
-          url: process.env.PAYMENT_SERVICE_URL || 'localhost:50056',
+          url: process.env.PAYMENT_SERVICE_URL || '0.0.0.0:50056',
           package: 'payment',
           protoPath: join(__dirname, '../proto/payment.proto'),
         },
@@ -93,8 +95,15 @@ import { OrderService } from './order/order.service';
       },
     ]),
   ],
-  controllers: [UserController, AuthController, AppController, RestaurantController, OrderController],
-  providers: [UserService, JwtStrategy, AuthService, RestaurantService, OrderService],
+  controllers: [
+    UserController,
+    AuthController,
+    AppController,
+    RestaurantController,
+    OrderController,
+    PaymentController,
+  ],
+  providers: [UserService, JwtStrategy, AuthService, RestaurantService, OrderService, PaymentService],
   exports: [AuthService],
 })
 export class AppModule {}
