@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package menu;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service MenuService {
+  rpc CreateMenu(CreateMenuRequest) returns (Menu);
+  rpc GetMenuById(Id) returns (Menu);
+  rpc GetMenusByRestaurantId(RestaurantIdRequest) returns (MenuList);
+  rpc GetMenusByName(NameRequest) returns (MenuList);
+  rpc UpdateMenu(UpdateMenuRequest) returns (Menu);
+  rpc UpdateMenuStatus(UpdateMenuStatusRequest) returns (Menu);
+  rpc DeleteMenu(Id) returns (google.protobuf.Empty);
+  rpc GetAllMenus(google.protobuf.Empty) returns (MenuList);
+  rpc GetAllValidMenus(google.protobuf.Empty) returns (MenuList);
+}
+
+message UpdateMenuStatusRequest {
+  string id = 1;
+  bool available = 2;
+}
+
+message Id {
+  string id = 1;
+}
+
+message RestaurantIdRequest {
+  string restaurantId = 1;
+}
+
+message NameRequest {
+  string name = 1;
+}
+
+message Menu {
+  string id = 1;
+  string menuId = 2;
+  string restaurantId = 3;
+  string name = 4;
+  string description = 5;
+  double price = 6;
+  string imageUrl = 7;
+  bool available = 8;
+  google.protobuf.Timestamp createdAt = 9;
+  google.protobuf.Timestamp updatedAt = 10;
+}
+
+message CreateMenuRequest {
+  string restaurantId = 1;
+  string name = 2;
+  string description = 3;
+  double price = 4;
+  string imageUrl = 5;
+  bool available = 6;
+}
+
+message UpdateMenuRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  double price = 4;
+  string imageUrl = 5;
+  bool available = 6;
+}
+
+message MenuList {
+  repeated Menu menus = 1;
+}

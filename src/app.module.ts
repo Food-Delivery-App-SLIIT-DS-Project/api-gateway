@@ -2,7 +2,7 @@
 import { ConfigModule } from '@nestjs/config';
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { Module } from '@nestjs/common';
+import { Module, Res } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
 import { join } from 'path';
@@ -14,8 +14,10 @@ import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { AUTH_PACKAGE_NAME, AUTH_SERVICE_NAME } from './auth/types';
 import { JwtStrategy } from './auth/strategy/JwtStrategy';
+import { RestaurantModule } from './restaurant/restaurant.module';
 
 @Module({
+  
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     // Register microservices (gRPC clients)
@@ -82,7 +84,7 @@ import { JwtStrategy } from './auth/strategy/JwtStrategy';
           protoPath: join(__dirname, '../proto/payment.proto'),
         },
       },
-      // Register the restaurant service client---------------------
+      /* Register the restaurant service client---------------------
       {
         name: 'RESTAURANT_SERVICE',
         transport: Transport.GRPC,
@@ -91,8 +93,10 @@ import { JwtStrategy } from './auth/strategy/JwtStrategy';
           package: 'restaurant',
           protoPath: join(__dirname, '../proto/restaurant.proto'),
         },
-      },
-    ]),
+      },*/ 
+      
+    ]),  
+    RestaurantModule, 
   ],
   controllers: [UserController, AuthController, AppController],
   providers: [UserService, JwtStrategy, AuthService],

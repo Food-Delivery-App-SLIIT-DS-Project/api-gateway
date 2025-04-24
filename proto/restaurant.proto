@@ -1,39 +1,119 @@
-syntax="proto3";
+syntax = "proto3";
+option optimize_for = SPEED;
+
 package restaurant;
 
-service RestaurantService{
-    rpc CreateRestaurant(CreateRestaurantDto) returns (Restaurant){}
-    rpc FindAllRestaurants(Empty) returns (RestaurantList){}
-    rpc FindRestaurantById(FineOneRestaurantDto) returns (Restaurant){}
-    rpc UpdateRestaurant(UpdateRestaurantDto) returns (Restaurant){}
-    rpc DeleteRestaurant(FineOneRestaurantDto) returns (Restaurant){}
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service RestaurantService {
+  rpc CreateRestaurant(CreateRestaurantRequest) returns (Restaurant);
+  rpc GetRestaurant(RestaurantId) returns (Restaurant);
+  rpc GetAllRestaurants(google.protobuf.Empty) returns (RestaurantList);
+  rpc UpdateRestaurant(UpdateRestaurantRequest) returns (Restaurant);
+  rpc DeleteRestaurant(RestaurantId) returns (google.protobuf.Empty);
+  rpc GetRestaurantByName(NameRequest) returns (Restaurant);
+  rpc GetRestaurantsByCuisine(CuisineRequest) returns (RestaurantList);
+  rpc GetRestaurantsByUserId(UserIdRequest) returns (RestaurantList);
+  rpc UpdateIsVerified(UpdateIsVerifiedRequest) returns (RestaurantResponse);
+  rpc UpdateIsOpen(UpdateIsOpenRequest) returns (RestaurantResponse);
+  rpc GetRestaurantsByRating(RatingRequest) returns (RestaurantList);
+  rpc GetRestaurantsByLocation(LocationRequest) returns (RestaurantList);
+  rpc GetAllRestaurantsWithFilters(google.protobuf.Empty) returns (RestaurantList);
+
 }
-message Empty {}
-message RestaurantList{
-    repeated Restaurant restaurants = 1;
+
+// Common Messages
+message RestaurantId {
+  string restaurantId = 1;
 }
-message FineOneRestaurantDto{
-    string id = 1;
+
+message RestaurantResponse {
+  Restaurant restaurant = 1;
 }
-message CreateRestaurantDto{
-    string id = 1;
-    string name = 2;
-    string address = 3;
-    string phone = 4;
+
+message NameRequest {
+  string name = 1;
 }
-message UpdateRestaurantDto{
-    string id = 1;
-    string name = 2;
-    string address = 3;
-    string phone = 4;
+
+message CuisineRequest {
+  string cuisine = 1;
 }
-message Restaurant{
-    string id = 1;
-    string name = 2;
-    string address = 3;
-    string phone = 4;
+
+message UserIdRequest {
+  string userId = 1;
 }
-message RestaurantStatus{
-    string id = 1;
-    string status = 2;
+
+message RatingRequest {
+  int32 rating = 1;
+}
+
+message Coordinates {
+  double longitude = 1;
+  double latitude = 2;
+}
+
+message LocationRequest {
+  double latitude = 1;
+  double longitude = 2;
+  double radius = 3; // in kilometers
+}
+
+// Restaurant Data
+message Restaurant {
+  string restaurantId = 1;
+  string userId = 2;
+  string name = 3;
+  string address = 4;
+  Coordinates location = 5;
+  string phone = 6;
+  string cuisineType = 7;
+  string description = 8;
+  string openHours = 9;
+  string imageReference = 10;
+  int32 numberOfRatings = 11;
+  bool isOpen = 12;
+  bool isVerified = 13;
+  google.protobuf.Timestamp createdAt = 14;
+  google.protobuf.Timestamp updatedAt = 15;
+}
+
+message CreateRestaurantRequest {
+  string userId = 1;
+  string name = 2;
+  string address = 3;
+  Coordinates location = 4;
+  string phone = 5;
+  string cuisineType = 6;
+  string description = 7;
+  string openHours = 8;
+  optional string imageReference = 9;
+}
+
+message UpdateRestaurantRequest {
+  string restaurantId = 1;
+  optional string name = 2;
+  optional string address = 3;
+  optional Coordinates location = 4;
+  optional string phone = 5;
+  optional string cuisineType = 6;
+  optional string description = 7;
+  optional string openHours = 8;
+  optional string imageReference = 9;
+  optional bool isOpen = 10;
+  optional bool isVerified = 11;
+}
+
+message RestaurantList {
+  repeated Restaurant restaurants = 1;
+}
+
+message UpdateIsVerifiedRequest {
+  string restaurantId = 1;
+  bool isVerified = 2;
+}
+
+message UpdateIsOpenRequest {
+  string restaurantId = 1;
+  bool isOpen = 2;
 }

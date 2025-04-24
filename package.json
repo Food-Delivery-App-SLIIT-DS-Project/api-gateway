@@ -17,6 +17,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "proto:generate:restaurant": "npx protoc --plugin=protoc-gen-ts_proto=node_modules/.bin/protoc-gen-ts_proto.cmd --ts_proto_out=src/restaurant/types --ts_proto_opt=nestJs=true,addGrpcMetadata=true,useExactTypes=false --proto_path=./proto ./proto/restaurant.proto",
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
@@ -38,7 +39,8 @@
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.2",
+    "ts-proto": "^2.7.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
