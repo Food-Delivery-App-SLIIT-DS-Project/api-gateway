@@ -26,6 +26,12 @@ import { PaymentService } from './payment/payment.service';
 import { MenuController } from './restaurant/menu/menu.controller';
 import { MenuService } from './restaurant/menu/menu.service';
 import { MENU_PACKAGE_NAME } from './restaurant/types/menu';
+import { VehicleController } from './delivery/vehicle/vehicle.controller';
+import { DeliveryController } from './delivery/delivery.controller';
+import { VehicleService } from './delivery/vehicle/vehicle.service';
+import { DeliveryService } from './delivery/delivery.service';
+import { DELIVERY_PACKAGE_NAME, DELIVERY_SERVICE_NAME } from './delivery/types/delivery';
+import { VEHICLE_PACKAGE_NAME } from './delivery/types/vehicle';
 
 @Module({
   imports: [
@@ -52,12 +58,18 @@ import { MENU_PACKAGE_NAME } from './restaurant/types/menu';
         },
       },
       {
-        name: 'DELIVERY_SERVICE',
+        name: DELIVERY_SERVICE_NAME,
         transport: Transport.GRPC,
         options: {
-          url: process.env.DELIVERY_SERVICE_URL || 'delivery-service:50053',
-          package: 'delivery',
-          protoPath: join(__dirname, '../proto/delivery.proto'),
+          url: process.env.DELIVERY_SERVICE_URL || 'localhost:50053',
+          package: [
+            DELIVERY_PACKAGE_NAME,
+            VEHICLE_PACKAGE_NAME
+          ],
+          protoPath: [
+            join(__dirname, '../proto/delivery.proto'),
+            join(__dirname, '../proto/vehicle.proto')
+          ]
         },
       },
       {
@@ -106,8 +118,12 @@ import { MENU_PACKAGE_NAME } from './restaurant/types/menu';
     OrderController,
     PaymentController,
     MenuController,
+    VehicleController,
+    DeliveryController
   ],
-  providers: [UserService, JwtStrategy, AuthService, RestaurantService, OrderService, PaymentService, MenuService],
+  providers: [UserService, JwtStrategy, AuthService, RestaurantService, OrderService, PaymentService, MenuService,
+    VehicleService, DeliveryService
+  ],
   exports: [AuthService],
 })
 export class AppModule {}
