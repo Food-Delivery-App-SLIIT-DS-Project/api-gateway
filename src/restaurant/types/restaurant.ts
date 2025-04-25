@@ -13,10 +13,6 @@ export const protobufPackage = 'restaurant';
 export interface OrderAcceptedDto {
   orderId: string;
   restaurantId: string;
-  location: {
-    lat: string;
-    lng: string;
-  };
 }
 
 export interface OrderAcceptedResponse {
@@ -24,101 +20,222 @@ export interface OrderAcceptedResponse {
   status: boolean;
 }
 
+/** empty message */
 export interface Empty {}
 
-export interface FindOneDto {
-  id: string;
+export interface RatingIncrease {
+  restaurantId: string;
 }
 
-export interface CreateRestaurantDto {
+export interface RestaurantId {
+  restaurantId: string;
+}
+
+export interface NameRequest {
+  name: string;
+}
+
+export interface CuisineRequest {
+  cuisine: string;
+}
+
+export interface UserIdRequest {
   userId: string;
-  restaurantName: string;
-  address: string;
-  openingHours: string;
-  cuisineType: string;
 }
 
-export interface UpdateRestaurantDto {
-  id: string;
-  restaurantName: string;
-  address: string;
-  openingHours: string;
-  cuisineType: string;
+export interface Coordinates {
+  longitude: number;
+  latitude: number;
 }
 
-export interface RestaurantResponse {
-  id: string;
-  userId: string;
-  restaurantName: string;
-  address: string;
-  openingHours: string;
-  cuisineType: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+export interface LocationRequest {
+  latitude: number;
+  longitude: number;
+  radius: number;
 }
 
 export interface RestaurantList {
   restaurants: RestaurantResponse[];
 }
 
-export interface DeleteResponse {
-  success: boolean;
+export interface UpdateIsVerifiedRequest {
+  restaurantId: string;
+  isVerified: boolean;
+}
+
+export interface UpdateIsOpenRequest {
+  restaurantId: string;
+  isOpen: boolean;
+}
+
+/** Restaurant Data */
+export interface RestaurantResponse {
+  restaurantId: string;
+  userId: string;
+  name: string;
+  address: string;
+  location: Coordinates | undefined;
+  phone: string;
+  cuisineType: string;
+  description: string;
+  openHours: string;
+  imageReference: string;
+  numberOfRatings: number;
+  isOpen: boolean;
+  isVerified: boolean;
+}
+
+export interface CreateRestaurantRequest {
+  userId: string;
+  name: string;
+  address: string;
+  location: Coordinates | undefined;
+  phone: string;
+  cuisineType: string;
+  description: string;
+  openHours: string;
+  imageReference: string;
+}
+
+export interface UpdateRestaurantRequest {
+  restaurantId: string;
+  name: string;
+  address: string;
+  location: Coordinates | undefined;
+  phone: string;
+  cuisineType: string;
+  description: string;
+  openHours: string;
+  imageReference: string;
+  isOpen: boolean;
+  isVerified: boolean;
 }
 
 export const RESTAURANT_PACKAGE_NAME = 'restaurant';
 
+/** rpc list */
+
 export interface RestaurantServiceClient {
   createRestaurant(
-    request: CreateRestaurantDto,
+    request: CreateRestaurantRequest,
   ): Observable<RestaurantResponse>;
 
-  findRestaurantById(request: FindOneDto): Observable<RestaurantResponse>;
+  getRestaurant(request: RestaurantId): Observable<RestaurantResponse>;
 
-  findAllRestaurants(request: Empty): Observable<RestaurantList>;
+  getAllRestaurants(request: Empty): Observable<RestaurantList>;
 
   updateRestaurant(
-    request: UpdateRestaurantDto,
+    request: UpdateRestaurantRequest,
   ): Observable<RestaurantResponse>;
 
-  deleteRestaurant(request: FindOneDto): Observable<DeleteResponse>;
+  deleteRestaurant(request: RestaurantId): Observable<Empty>;
 
-  restaurantAcceptOrder(
+  getRestaurantByName(request: NameRequest): Observable<RestaurantResponse>;
+
+  getRestaurantsByCuisine(request: CuisineRequest): Observable<RestaurantList>;
+
+  getRestaurantsByUserId(request: UserIdRequest): Observable<RestaurantList>;
+
+  updateIsVerified(
+    request: UpdateIsVerifiedRequest,
+  ): Observable<RestaurantResponse>;
+
+  updateIsOpen(request: UpdateIsOpenRequest): Observable<RestaurantResponse>;
+
+  getRestaurantsByLocation(
+    request: LocationRequest,
+  ): Observable<RestaurantList>;
+
+  getAllRestaurantsWithFilters(request: Empty): Observable<RestaurantList>;
+
+  updateRating(request: RatingIncrease): Observable<Empty>;
+
+  decreaseRating(request: RestaurantId): Observable<Empty>;
+
+  restaurantOrderAcceptOrReject(
     request: OrderAcceptedDto,
   ): Observable<OrderAcceptedResponse>;
 }
 
+/** rpc list */
+
 export interface RestaurantServiceController {
   createRestaurant(
-    request: CreateRestaurantDto,
+    request: CreateRestaurantRequest,
   ):
     | Promise<RestaurantResponse>
     | Observable<RestaurantResponse>
     | RestaurantResponse;
 
-  findRestaurantById(
-    request: FindOneDto,
+  getRestaurant(
+    request: RestaurantId,
   ):
     | Promise<RestaurantResponse>
     | Observable<RestaurantResponse>
     | RestaurantResponse;
 
-  findAllRestaurants(
+  getAllRestaurants(
     request: Empty,
   ): Promise<RestaurantList> | Observable<RestaurantList> | RestaurantList;
 
   updateRestaurant(
-    request: UpdateRestaurantDto,
+    request: UpdateRestaurantRequest,
   ):
     | Promise<RestaurantResponse>
     | Observable<RestaurantResponse>
     | RestaurantResponse;
 
   deleteRestaurant(
-    request: FindOneDto,
-  ): Promise<DeleteResponse> | Observable<DeleteResponse> | DeleteResponse;
+    request: RestaurantId,
+  ): Promise<Empty> | Observable<Empty> | Empty;
 
-  restaurantAcceptOrder(
-    request: OrderAcceptedDto,
+  getRestaurantByName(
+    request: NameRequest,
+  ):
+    | Promise<RestaurantResponse>
+    | Observable<RestaurantResponse>
+    | RestaurantResponse;
+
+  getRestaurantsByCuisine(
+    request: CuisineRequest,
+  ): Promise<RestaurantList> | Observable<RestaurantList> | RestaurantList;
+
+  getRestaurantsByUserId(
+    request: UserIdRequest,
+  ): Promise<RestaurantList> | Observable<RestaurantList> | RestaurantList;
+
+  updateIsVerified(
+    request: UpdateIsVerifiedRequest,
+  ):
+    | Promise<RestaurantResponse>
+    | Observable<RestaurantResponse>
+    | RestaurantResponse;
+
+  updateIsOpen(
+    request: UpdateIsOpenRequest,
+  ):
+    | Promise<RestaurantResponse>
+    | Observable<RestaurantResponse>
+    | RestaurantResponse;
+
+  getRestaurantsByLocation(
+    request: LocationRequest,
+  ): Promise<RestaurantList> | Observable<RestaurantList> | RestaurantList;
+
+  getAllRestaurantsWithFilters(
+    request: Empty,
+  ): Promise<RestaurantList> | Observable<RestaurantList> | RestaurantList;
+
+  updateRating(
+    request: RatingIncrease,
+  ): Promise<Empty> | Observable<Empty> | Empty;
+
+  decreaseRating(
+    request: RestaurantId,
+  ): Promise<Empty> | Observable<Empty> | Empty;
+
+  restaurantOrderAcceptOrReject(
+    request: RestaurantId,
   ):
     | Promise<OrderAcceptedResponse>
     | Observable<OrderAcceptedResponse>
@@ -129,11 +246,20 @@ export function RestaurantServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
       'createRestaurant',
-      'findRestaurantById',
-      'findAllRestaurants',
+      'getRestaurant',
+      'getAllRestaurants',
       'updateRestaurant',
       'deleteRestaurant',
-      'restaurantAcceptOrder',
+      'getRestaurantByName',
+      'getRestaurantsByCuisine',
+      'getRestaurantsByUserId',
+      'updateIsVerified',
+      'updateIsOpen',
+      'getRestaurantsByLocation',
+      'getAllRestaurantsWithFilters',
+      'updateRating',
+      'decreaseRating',
+      'restaurantOrderAcceptOrReject',
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(

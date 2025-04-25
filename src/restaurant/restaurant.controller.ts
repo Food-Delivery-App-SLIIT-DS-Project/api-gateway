@@ -1,20 +1,24 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable prettier/prettier */
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus } from '@nestjs/common';
 import { RestaurantService } from './restaurant.service';
-import { CreateRestaurantDto, UpdateRestaurantDto } from './types/restaurant';
 import { RestaurantResponse } from './types/response';
 
 import { catchError, lastValueFrom, throwError } from 'rxjs';
+import { CreateRestaurantDto } from './dto/create-restaurant.dto';
+import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 
 @Controller('restaurant')
 export class RestaurantController {
   constructor(private readonly restaurantService: RestaurantService) {}
 
   @Post('accept-order')
-  async acceptOrder(@Body() orderAcceptedDto: { orderId: string; restaurantId: string; location: { lat: string; lng: string } }) {
+  async acceptOrder(
+    @Body() orderAcceptedDto: { orderId: string; restaurantId: string; location: { lat: string; lng: string } },
+  ) {
     try {
-      console.log("Accepting order with DTO:", orderAcceptedDto);
+      console.log('Accepting order with DTO:', orderAcceptedDto);
       const response = await lastValueFrom(this.restaurantService.restaurantAcceptOrder(orderAcceptedDto));
       return {
         code: '200',
@@ -64,12 +68,19 @@ export class RestaurantController {
         code: '200',
         message: 'success',
         data: {
-          restaurant_id: restaurant.id,
+          restaurant_id: restaurant.restaurantId,
           user_id: restaurant.userId,
-          restaurant_name: restaurant.restaurantName,
+          restaurant_name: restaurant.name,
           address: restaurant.address,
-          opening_hours: restaurant.openingHours,
+          opening_hours: restaurant.openHours,
           cuisine_type: restaurant.cuisineType,
+          location: restaurant.location,
+          phone: restaurant.phone,
+          description: restaurant.description,
+          image_reference: restaurant.imageReference,
+          number_of_ratings: restaurant.numberOfRatings,
+          is_open: restaurant.isOpen,
+          is_verified: restaurant.isVerified,
         },
       };
 
@@ -93,28 +104,25 @@ export class RestaurantController {
   }
 
   @Get()
-  async findAll(): Promise<
-    RestaurantResponse<
-      {
-        restaurant_id: string;
-        user_id: string;
-        restaurant_name: string;
-        address: string;
-        opening_hours: string;
-        cuisine_type: string;
-      }[]
-    >
-  > {
+  async findAll() {
+    console.log('Fetching all restaurants');
     try {
-      const restaurantList = await lastValueFrom(this.restaurantService.findAllRestaurants({}));
+      const restaurantList = await lastValueFrom(this.restaurantService.findAllRestaurants());
 
       const formattedData = restaurantList.restaurants.map((restaurant) => ({
-        restaurant_id: restaurant.id,
+        restaurant_id: restaurant.restaurantId,
         user_id: restaurant.userId,
-        restaurant_name: restaurant.restaurantName,
+        restaurant_name: restaurant.name,
         address: restaurant.address,
-        opening_hours: restaurant.openingHours,
+        opening_hours: restaurant.openHours,
         cuisine_type: restaurant.cuisineType,
+        location: restaurant.location,
+        phone: restaurant.phone,
+        description: restaurant.description,
+        image_reference: restaurant.imageReference,
+        number_of_ratings: restaurant.numberOfRatings,
+        is_open: restaurant.isOpen,
+        is_verified: restaurant.isVerified,
       }));
 
       return {
@@ -122,7 +130,7 @@ export class RestaurantController {
         message: 'success',
         data: formattedData,
       };
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       throw new HttpException(
         {
@@ -136,18 +144,25 @@ export class RestaurantController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') restaurantId: string) {
     try {
-      return lastValueFrom(this.restaurantService.findRestaurantById({ id })).then((restaurant) => {
+      return lastValueFrom(this.restaurantService.findRestaurantById({ restaurantId })).then((restaurant) => {
         const response: RestaurantResponse = {
           code: '200',
           message: 'success',
           data: {
-            restaurant_id: restaurant.id,
+            restaurant_id: restaurant.restaurantId,
             user_id: restaurant.userId,
-            restaurant_name: restaurant.restaurantName,
+            restaurant_name: restaurant.name,
             address: restaurant.address,
-            opening_hours: restaurant.openingHours,
+            opening_hours: restaurant.openHours,
+            location: restaurant.location,
+            phone: restaurant.phone,
+            description: restaurant.description,
+            image_reference: restaurant.imageReference,
+            number_of_ratings: restaurant.numberOfRatings,
+            is_open: restaurant.isOpen,
+            is_verified: restaurant.isVerified,
             cuisine_type: restaurant.cuisineType,
           },
         };
@@ -173,11 +188,18 @@ export class RestaurantController {
           code: '200',
           message: 'success',
           data: {
-            restaurant_id: restaurant.id,
+            restaurant_id: restaurant.restaurantId,
             user_id: restaurant.userId,
-            restaurant_name: restaurant.restaurantName,
+            restaurant_name: restaurant.name,
             address: restaurant.address,
-            opening_hours: restaurant.openingHours,
+            opening_hours: restaurant.openHours,
+            location: restaurant.location,
+            phone: restaurant.phone,
+            description: restaurant.description,
+            image_reference: restaurant.imageReference,
+            number_of_ratings: restaurant.numberOfRatings,
+            is_open: restaurant.isOpen,
+            is_verified: restaurant.isVerified,
             cuisine_type: restaurant.cuisineType,
           },
         };
@@ -196,14 +218,15 @@ export class RestaurantController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id') restaurantId: string) {
     try {
-      return lastValueFrom(this.restaurantService.deleteRestaurant({ id })).then((response) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      return lastValueFrom(this.restaurantService.deleteRestaurant({ restaurantId })).then((response) => {
         return {
           code: '200',
           message: 'success',
           data: {
-            success: response.success,
+            success: true, // Assuming the deletion is always successful; adjust based on actual logic
           },
         };
       });

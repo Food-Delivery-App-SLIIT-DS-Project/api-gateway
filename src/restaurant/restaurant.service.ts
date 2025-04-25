@@ -1,20 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import {
-  CreateRestaurantDto,
-  DeleteResponse,
-  Empty,
-  FindOneDto,
   OrderAcceptedDto,
   OrderAcceptedResponse,
   RESTAURANT_SERVICE_NAME,
+  RestaurantId,
   RestaurantList,
   RestaurantResponse,
   RestaurantServiceClient,
-  UpdateRestaurantDto,
 } from './types/restaurant';
 import { Observable } from 'rxjs';
 import { ClientGrpc } from '@nestjs/microservices';
+import { CreateRestaurantDto } from './dto/create-restaurant.dto';
+import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 
 @Injectable()
 export class RestaurantService implements OnModuleInit {
@@ -25,22 +23,22 @@ export class RestaurantService implements OnModuleInit {
   }
   // ----------- Restaurant Service -----------
   restaurantAcceptOrder(request: OrderAcceptedDto): Observable<OrderAcceptedResponse> {
-    return this.restaurantServiceClient.restaurantAcceptOrder(request);
+    return this.restaurantServiceClient.restaurantOrderAcceptOrReject(request);
   }
   // ----------- Restaurant Service -----------
   createRestaurant(request: CreateRestaurantDto) {
     return this.restaurantServiceClient.createRestaurant(request);
   }
-  findRestaurantById(request: FindOneDto): Observable<RestaurantResponse> {
-    return this.restaurantServiceClient.findRestaurantById(request);
+  findRestaurantById(request: RestaurantId): Observable<RestaurantResponse> {
+    return this.restaurantServiceClient.getRestaurant(request);
   }
-  findAllRestaurants(request: Empty): Observable<RestaurantList> {
-    return this.client.getService<RestaurantServiceClient>(RESTAURANT_SERVICE_NAME).findAllRestaurants(request);
+  findAllRestaurants(): Observable<RestaurantList> {
+    return this.restaurantServiceClient.getAllRestaurants({});
   }
   updateRestaurant(request: UpdateRestaurantDto): Observable<RestaurantResponse> {
     return this.restaurantServiceClient.updateRestaurant(request);
   }
-  deleteRestaurant(request: FindOneDto): Observable<DeleteResponse> {
+  deleteRestaurant(request: RestaurantId) {
     return this.restaurantServiceClient.deleteRestaurant(request);
   }
 }
