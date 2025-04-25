@@ -14,7 +14,9 @@ import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { AUTH_PACKAGE_NAME, AUTH_SERVICE_NAME } from './auth/types';
 import { JwtStrategy } from './auth/strategy/JwtStrategy';
+import { MenuModule } from './menu/menu.module';
 import { RestaurantModule } from './restaurant/restaurant.module';
+
 
 @Module({
   
@@ -84,18 +86,28 @@ import { RestaurantModule } from './restaurant/restaurant.module';
           protoPath: join(__dirname, '../proto/payment.proto'),
         },
       },
-      /* Register the restaurant service client---------------------
+      //Register the restaurant service client---------------------
       {
-        name: 'RESTAURANT_SERVICE',
+        name: 'RESTAURANT_SERVICE_NAME',
         transport: Transport.GRPC,
         options: {
           url: process.env.RESTAURANT_SERVICE_URL || 'restaurant-service:50057',
           package: 'restaurant',
-          protoPath: join(__dirname, '../proto/restaurant.proto'),
+          protoPath: 
+            join(__dirname, '../proto/restaurant.proto'),
         },
-      },*/ 
-      
-    ]),  
+      },
+      {
+        name: 'MENU_SERVICE_NAME',
+        transport: Transport.GRPC,
+        options: {
+          url: process.env.RESTAURANT_SERVICE_URL || 'restaurant-service:50057', // same host/port
+          package: 'menu',
+          protoPath: join(__dirname, '../proto/menu.proto'),
+        },
+      },
+    ]),
+    MenuModule,
     RestaurantModule, 
   ],
   controllers: [UserController, AuthController, AppController],

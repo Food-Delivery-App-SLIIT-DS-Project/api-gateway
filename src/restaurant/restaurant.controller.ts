@@ -1,104 +1,139 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { RestaurantService } from './restaurant.service';
-import { CreateRestaurantDto } from './dto/create-restaurant.dto';
-import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
-import { Restaurant } from './types/restaurant';
+import { RestaurantResponse, RestaurantList } from './types/restaurant';
 
 @Controller('restaurants')
 export class RestaurantController {
   constructor(private readonly restaurantService: RestaurantService) {}
 
-  // Create a new restaurant
   @Post()
-  async create(@Body() createRestaurantDto: CreateRestaurantDto): Promise<Restaurant> {
-    return this.restaurantService.createRestaurant(createRestaurantDto);
+  async createRestaurant(
+    @Body()
+    body: {
+      userId: string;
+      name: string;
+      address: string;
+      latitude: number;
+      longitude: number;
+      phone: string;
+      cuisineType: string;
+      description: string;
+      openHours: string;
+      imageReference: string;
+    },
+  ): Promise<RestaurantResponse> {
+    return this.restaurantService.createRestaurant(
+      body.userId,
+      body.name,
+      body.address,
+      body.latitude,
+      body.longitude,
+      body.phone,
+      body.cuisineType,
+      body.description,
+      body.openHours,
+      body.imageReference,
+    );
   }
 
-  // Get a single restaurant by ID
-  @Get(':id')
-  async getRestaurant(@Param('id') restaurantId: string): Promise<Restaurant> {
-    return this.restaurantService.getRestaurant(restaurantId);
-  }
-
-  // Get all restaurants
   @Get()
-  async getAllRestaurants(): Promise<Restaurant[]> {
-    const restaurantList = await this.restaurantService.getAllRestaurants();
-    console.log('Get all restaurants: Working');
-    return restaurantList.restaurants;
+  async getAllRestaurants(): Promise<RestaurantList> {
+    return this.restaurantService.getAllRestaurants();
   }
 
-  // Get all restaurants with filters (if any)
   @Get('filters')
-  async getAllRestaurantsWithFilters(): Promise<Restaurant[]> {
-    const restaurantList = await this.restaurantService.getAllRestaurantsWithFilters();
-    return restaurantList.restaurants;
+  async getAllRestaurantsWithFilters(): Promise<RestaurantList> {
+    return this.restaurantService.getAllRestaurantsWithFilters();
   }
 
-  // Update a restaurant
-  @Put(':id')
-  async update(
-    @Param('id') restaurantId: string,
-    @Body() updateRestaurantDto: UpdateRestaurantDto,
-  ): Promise<Restaurant> {
-    // Optionally, you can include restaurantId in the DTO
-    updateRestaurantDto.restaurantId = restaurantId;
-    return this.restaurantService.updateRestaurant(updateRestaurantDto);
-  }
-
-  // Delete a restaurant by ID
-  @Delete(':id')
-  async delete(@Param('id') restaurantId: string): Promise<void> {
-    await this.restaurantService.deleteRestaurant(restaurantId);
-  }
-
-  // Get restaurants by name
-  @Get('name/:name')
-  async getRestaurantByName(@Param('name') name: string): Promise<Restaurant> {
+  @Get('by-name/:name')
+  async getRestaurantByName(@Param('name') name: string): Promise<RestaurantResponse> {
     return this.restaurantService.getRestaurantByName(name);
   }
 
-  // Get restaurants by cuisine type
-  @Get('cuisine/:cuisine')
-  async getRestaurantsByCuisine(@Param('cuisine') cuisine: string): Promise<Restaurant[]> {
-    const restaurantList = await this.restaurantService.getRestaurantsByCuisine(cuisine);
-    return restaurantList.restaurants;
+  @Get('by-cuisine/:cuisine')
+  async getRestaurantsByCuisine(@Param('cuisine') cuisine: string): Promise<RestaurantList> {
+    return this.restaurantService.getRestaurantsByCuisine(cuisine);
   }
 
-  // Get restaurants by user ID
-  @Get('user/:userId')
-  async getRestaurantsByUserId(@Param('userId') userId: string): Promise<Restaurant[]> {
-    const restaurantList = await this.restaurantService.getRestaurantsByUserId(userId);
-    return restaurantList.restaurants;
+  @Get('by-user/:userId')
+  async getRestaurantsByUserId(@Param('userId') userId: string): Promise<RestaurantList> {
+    return this.restaurantService.getRestaurantsByUserId(userId);
   }
 
-  // Update restaurant verified status
-  @Put(':id/verify')
-  async updateIsVerified(@Param('id') restaurantId: string, @Body('isVerified') isVerified: boolean): Promise<void> {
-    await this.restaurantService.updateIsVerified(restaurantId, isVerified);
-  }
-
-  // Update restaurant open status
-  @Put(':id/open')
-  async updateIsOpen(@Param('id') restaurantId: string, @Body('isOpen') isOpen: boolean): Promise<void> {
-    await this.restaurantService.updateIsOpen(restaurantId, isOpen);
-  }
-
-  // Get restaurants by rating
-  @Get('rating')
-  async getRestaurantsByRating(@Query('rating') rating: number): Promise<Restaurant[]> {
-    const restaurantList = await this.restaurantService.getRestaurantsByRating(rating);
-    return restaurantList.restaurants;
-  }
-
-  // Get restaurants by location (latitude, longitude, radius)
-  @Get('location')
+  @Get('by-location')
   async getRestaurantsByLocation(
     @Query('latitude') latitude: number,
     @Query('longitude') longitude: number,
     @Query('radius') radius: number,
-  ): Promise<Restaurant[]> {
-    const restaurantList = await this.restaurantService.getRestaurantsByLocation(latitude, longitude, radius);
-    return restaurantList.restaurants;
+  ): Promise<RestaurantList> {
+    return this.restaurantService.getRestaurantsByLocation(Number(latitude), Number(longitude), Number(radius));
+  }
+
+  @Get(':id')
+  async getRestaurant(@Param('id') restaurantId: string): Promise<RestaurantResponse> {
+    return this.restaurantService.getRestaurant(restaurantId);
+  }
+
+  @Patch(':id')
+  async updateRestaurant(
+    @Param('id') restaurantId: string,
+    @Body()
+    body: {
+      name: string;
+      address: string;
+      latitude: number;
+      longitude: number;
+      phone: string;
+      cuisineType: string;
+      description: string;
+      openHours: string;
+      imageReference: string;
+      isOpen: boolean;
+      isVerified: boolean;
+    },
+  ): Promise<RestaurantResponse> {
+    return this.restaurantService.updateRestaurant(
+      restaurantId,
+      body.name,
+      body.address,
+      body.latitude,
+      body.longitude,
+      body.phone,
+      body.cuisineType,
+      body.description,
+      body.openHours,
+      body.imageReference,
+      body.isOpen,
+      body.isVerified,
+    );
+  }
+
+  @Delete(':id')
+  async deleteRestaurant(@Param('id') restaurantId: string) {
+    return this.restaurantService.deleteRestaurant(restaurantId);
+  }
+
+  @Patch(':id/verify')
+  async updateIsVerified(
+    @Param('id') restaurantId: string,
+    @Body('isVerified') isVerified: boolean,
+  ): Promise<RestaurantResponse> {
+    return this.restaurantService.updateIsVerified(restaurantId, isVerified);
+  }
+
+  @Patch(':id/open')
+  async updateIsOpen(@Param('id') restaurantId: string, @Body('isOpen') isOpen: boolean): Promise<RestaurantResponse> {
+    return this.restaurantService.updateIsOpen(restaurantId, isOpen);
+  }
+
+  @Patch(':id/rating/increase')
+  async updateRating(@Param('id') restaurantId: string) {
+    return this.restaurantService.updateRating(restaurantId);
+  }
+
+  @Patch(':id/rating/decrease')
+  async decreaseRating(@Param('id') restaurantId: string) {
+    return this.restaurantService.decreaseRating(restaurantId);
   }
 }
