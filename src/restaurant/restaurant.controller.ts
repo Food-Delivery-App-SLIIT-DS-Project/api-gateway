@@ -8,6 +8,7 @@ import { RestaurantResponse } from './types/response';
 import { catchError, lastValueFrom, throwError } from 'rxjs';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
+import { UpdateIsVerifiedRequest } from './types/restaurant';
 
 @Controller('restaurant')
 export class RestaurantController {
@@ -232,6 +233,43 @@ export class RestaurantController {
       });
     } catch (err) {
       console.error('Error deleting restaurant:', err);
+      throw new HttpException(
+        {
+          code: '500',
+          message: 'Internal server error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Patch('/verify/:id')
+  async updateIsVerified(@Param('id') restaurantId: string, @Body('is_verified') isVerified: boolean) {
+    try {
+      const request: UpdateIsVerifiedRequest = { restaurantId, isVerified };
+      return lastValueFrom(this.restaurantService.updateIsVerified(request)).then((restaurant) => {
+        return {
+          code: '200',
+          message: 'success',
+          data: {
+            restaurant_id: restaurant.restaurantId,
+            user_id: restaurant.userId,
+            restaurant_name: restaurant.name,
+            address: restaurant.address,
+            opening_hours: restaurant.openHours,
+            cuisine_type: restaurant.cuisineType,
+            location: restaurant.location,
+            phone: restaurant.phone,
+            description: restaurant.description,
+            image_reference: restaurant.imageReference,
+            number_of_ratings: restaurant.numberOfRatings,
+            is_open: restaurant.isOpen,
+            is_verified: restaurant.isVerified,
+          },
+        };
+      });
+    } catch (err) {
+      console.error('Error verifying restaurant:', err);
       throw new HttpException(
         {
           code: '500',

@@ -8,6 +8,7 @@ import {
   RestaurantList,
   RestaurantResponse,
   RestaurantServiceClient,
+  UpdateIsVerifiedRequest,
 } from './types/restaurant';
 import { Observable } from 'rxjs';
 import { ClientGrpc } from '@nestjs/microservices';
@@ -16,6 +17,7 @@ import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 
 @Injectable()
 export class RestaurantService implements OnModuleInit {
+
   private restaurantServiceClient: RestaurantServiceClient;
   constructor(@Inject(RESTAURANT_SERVICE_NAME) private readonly client: ClientGrpc) {}
   onModuleInit() {
@@ -40,5 +42,8 @@ export class RestaurantService implements OnModuleInit {
   }
   deleteRestaurant(request: RestaurantId) {
     return this.restaurantServiceClient.deleteRestaurant(request);
+  }
+  updateIsVerified(request: UpdateIsVerifiedRequest): Observable<RestaurantResponse> {
+    return this.restaurantServiceClient.updateIsVerified(request);
   }
 }
