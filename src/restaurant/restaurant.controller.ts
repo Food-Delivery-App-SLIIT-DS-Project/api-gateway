@@ -4,11 +4,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus } from '@nestjs/common';
 import { RestaurantService } from './restaurant.service';
 import { RestaurantResponse } from './types/response';
-
 import { catchError, lastValueFrom, throwError } from 'rxjs';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 import { UpdateIsVerifiedRequest } from './types/restaurant';
+import { RatingIncrease } from './types/restaurant';
 
 @Controller('restaurant')
 export class RestaurantController {
@@ -46,16 +46,12 @@ export class RestaurantController {
       const restaurant = await lastValueFrom(
         this.restaurantService.createRestaurant(createRestaurantDto).pipe(
           catchError((err) => {
-            // Optional: log the gRPC error
             console.error('gRPC Error:', err);
-
-            // Map gRPC error to HTTP error
             return throwError(
               () =>
                 new HttpException(
                   {
                     code: '500',
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                     message: err?.message || 'Internal server error',
                   },
                   HttpStatus.INTERNAL_SERVER_ERROR,
@@ -87,13 +83,10 @@ export class RestaurantController {
 
       return response;
     } catch (err) {
-      // Handle the exception thrown by throwError above
       console.error('Caught Error:', err);
-
       if (err instanceof HttpException) {
-        throw err; // Let NestJS handle it
+        throw err;
       }
-
       throw new HttpException(
         {
           code: '500',
@@ -106,10 +99,8 @@ export class RestaurantController {
 
   @Get()
   async findAll() {
-    console.log('Fetching all restaurants');
     try {
       const restaurantList = await lastValueFrom(this.restaurantService.findAllRestaurants());
-
       const formattedData = restaurantList.restaurants.map((restaurant) => ({
         restaurant_id: restaurant.restaurantId,
         user_id: restaurant.userId,
@@ -131,7 +122,6 @@ export class RestaurantController {
         message: 'success',
         data: formattedData,
       };
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       throw new HttpException(
         {
@@ -221,13 +211,12 @@ export class RestaurantController {
   @Delete(':id')
   async remove(@Param('id') restaurantId: string) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       return lastValueFrom(this.restaurantService.deleteRestaurant({ restaurantId })).then((response) => {
         return {
           code: '200',
           message: 'success',
           data: {
-            success: true, // Assuming the deletion is always successful; adjust based on actual logic
+            success: true,
           },
         };
       });
@@ -243,33 +232,180 @@ export class RestaurantController {
     }
   }
 
-  @Patch('/verify/:id')
-  async updateIsVerified(@Param('id') restaurantId: string, @Body('is_verified') isVerified: boolean) {
+  // ----------- New API Endpoints -----------
+
+  @Get('name/:name')
+  async findByName(@Param('name') name: string) {
     try {
-      const request: UpdateIsVerifiedRequest = { restaurantId, isVerified };
-      return lastValueFrom(this.restaurantService.updateIsVerified(request)).then((restaurant) => {
+      const restaurant = await lastValueFrom(this.restaurantService.findRestaurantByName({ name }));
+      return {
+        code: '200',
+        message: 'success',
+        data: {
+          restaurant_id: restaurant.restaurantId,
+          user_id: restaurant.userId,
+          restaurant_name: restaurant.name,
+          address: restaurant.address,
+          opening_hours: restaurant.openHours,
+          location: restaurant.location,
+          phone: restaurant.phone,
+          description: restaurant.description,
+          image_reference: restaurant.imageReference,
+          number_of_ratings: restaurant.numberOfRatings,
+          is_open: restaurant.isOpen,
+          is_verified: restaurant.isVerified,
+          cuisine_type: restaurant.cuisineType,
+        },
+      };
+    } catch (err) {
+      throw new HttpException(
+        {
+          code: '500',
+          message: 'Internal server error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('cuisine/:cuisine')
+  async findByCuisine(@Param('cuisine') cuisine: string) {
+    try {
+      const restaurants = await lastValueFrom(this.restaurantService.findRestaurantsByCuisine({ cuisine }));
+      const formattedData = restaurants.restaurants.map((restaurant) => ({
+        restaurant_id: restaurant.restaurantId,
+        user_id: restaurant.userId,
+        restaurant_name: restaurant.name,
+        address: restaurant.address,
+        opening_hours: restaurant.openHours,
+        cuisine_type: restaurant.cuisineType,
+        location: restaurant.location,
+        phone: restaurant.phone,
+        description: restaurant.description,
+        image_reference: restaurant.imageReference,
+        number_of_ratings: restaurant.numberOfRatings,
+        is_open: restaurant.isOpen,
+        is_verified: restaurant.isVerified,
+      }));
+
+      return {
+        code: '200',
+        message: 'success',
+        data: formattedData,
+      };
+    } catch (err) {
+      throw new HttpException(
+        {
+          code: '500',
+          message: 'Internal server error',
+          data: [],
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('user/:userId')
+  async findByUserId(@Param('userId') userId: string) {
+    try {
+      const restaurants = await lastValueFrom(this.restaurantService.findRestaurantsByUserId({ userId }));
+      const formattedData = restaurants.restaurants.map((restaurant) => ({
+        restaurant_id: restaurant.restaurantId,
+        user_id: restaurant.userId,
+        restaurant_name: restaurant.name,
+        address: restaurant.address,
+        opening_hours: restaurant.openHours,
+        cuisine_type: restaurant.cuisineType,
+        location: restaurant.location,
+        phone: restaurant.phone,
+        description: restaurant.description,
+        image_reference: restaurant.imageReference,
+        number_of_ratings: restaurant.numberOfRatings,
+        is_open: restaurant.isOpen,
+        is_verified: restaurant.isVerified,
+      }));
+
+      return {
+        code: '200',
+        message: 'success',
+        data: formattedData,
+      };
+    } catch (err) {
+      throw new HttpException(
+        {
+          code: '500',
+          message: 'Internal server error',
+          data: [],
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Patch(':id/verification')
+    async updateVerificationStatus(
+      @Param('id') restaurantId: string, 
+      @Body() updateIsVerifiedRequest: { isVerified: boolean }
+    ) {
+      try {
+        const request = { 
+          restaurantId, 
+          isVerified: updateIsVerifiedRequest.isVerified 
+        };
+        const restaurant = await lastValueFrom(this.restaurantService.updateRestaurantVerificationStatus(request));
         return {
           code: '200',
           message: 'success',
-          data: {
-            restaurant_id: restaurant.restaurantId,
-            user_id: restaurant.userId,
-            restaurant_name: restaurant.name,
-            address: restaurant.address,
-            opening_hours: restaurant.openHours,
-            cuisine_type: restaurant.cuisineType,
-            location: restaurant.location,
-            phone: restaurant.phone,
-            description: restaurant.description,
-            image_reference: restaurant.imageReference,
-            number_of_ratings: restaurant.numberOfRatings,
-            is_open: restaurant.isOpen,
-            is_verified: restaurant.isVerified,
-          },
+          data: restaurant,
         };
-      });
+      } catch (err) {
+        throw new HttpException(
+          {
+            code: '500',
+            message: 'Internal server error',
+          },
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+    }
+
+    @Patch(':id/open-status')
+    async updateOpenStatus(
+      @Param('id') restaurantId: string, 
+      @Body() updateIsOpenRequest: { isOpen: boolean }
+    ) {
+      try {
+        const request = { 
+          restaurantId, 
+          isOpen: updateIsOpenRequest.isOpen 
+        };
+        const restaurant = await lastValueFrom(this.restaurantService.updateRestaurantOpenStatus(request));
+        return {
+          code: '200',
+          message: 'success',
+          data: restaurant,
+        };
+      } catch (err) {
+        throw new HttpException(
+          {
+            code: '500',
+            message: 'Internal server error',
+          },
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+    }
+
+  @Patch(':id/rating')
+  async updateRating(@Param('id') restaurantId: string, @Body() ratingIncrease: RatingIncrease) {
+    try {
+      const response = await lastValueFrom(this.restaurantService.updateRestaurantRating(ratingIncrease));
+      return {
+        code: '200',
+        message: 'success',
+        data: response,
+      };
     } catch (err) {
-      console.error('Error verifying restaurant:', err);
       throw new HttpException(
         {
           code: '500',

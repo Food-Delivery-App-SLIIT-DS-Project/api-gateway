@@ -56,6 +56,20 @@ export class PaymentController {
     }
   }
 
+  @Get()
+  async findAllPayments() {
+    try {
+      const result = await firstValueFrom(this.paymentService.findAllPayments());
+      return {
+        code: 0,
+        msg: 'Payments fetched successfully',
+        data: result.payments,
+      };
+    } catch (error) {
+      return this.handleGrpcError(error);
+    }
+  }
+
   private handleGrpcError(error: any) {
     const code = error.code || status.UNKNOWN;
     const msg = error.message || 'Something went wrong';

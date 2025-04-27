@@ -6,6 +6,7 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { ClientGrpc } from '@nestjs/microservices';
 import { CreatePaymentRequest, PaymentServiceGrpc } from './types';
+import { Observable } from 'rxjs';
 
 @Injectable()
 export class PaymentService implements OnModuleInit {
@@ -33,5 +34,9 @@ create(createPaymentDto: CreatePaymentDto) {
   }
   refundPayment(paymentId: string) {
     return this.paymentServiceClient.RefundPayment({ paymentId });
+  }
+
+  findAllPayments(): Observable<{ payments: PaymentResponse[] }> {
+    return this.paymentServiceClient.FindAllPayments({});
   }
 }

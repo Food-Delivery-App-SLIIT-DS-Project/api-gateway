@@ -2,6 +2,7 @@ export interface PaymentServiceGrpc {
   CreatePayment(data: CreatePaymentRequest): any;
   GetPayment(data: { paymentId: string }): any;
   RefundPayment(data: { paymentId: string }): any;
+  FindAllPayments(data: {}): any;
 }
 
 export interface CreatePaymentRequest {
