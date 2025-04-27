@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 
 export const protobufPackage = 'vehicle';
 
-export interface Empty {}
+export interface Empty2 {}
 
 export interface Vehicle {
   vehicleId: string;
@@ -58,7 +58,6 @@ export interface UpdateVehicleAvailabilityDto {
 }
 
 export interface VehicleLocation {
-  vehicles: any;
   trackingId: string;
   vehicleId: string;
   latitude: number;
@@ -79,7 +78,7 @@ export interface VehicleServiceClient {
 
   findVehicleById(request: FindOneVehicleDto): Observable<Vehicle>;
 
-  findAllVehicles(request: Empty): Observable<VehicleList>;
+  findAllVehicles(request: Empty2): Observable<VehicleList>;
 
   deleteVehicle(request: FindOneVehicleDto): Observable<Vehicle>;
 
@@ -87,9 +86,11 @@ export interface VehicleServiceClient {
 
   /** find available vehicles */
 
-  findAvailableVehicles(request: Empty): Observable<VehicleList>;
+  findAvailableVehicles(request: Empty2): Observable<VehicleList>;
 
-  updateVehicleAvailability(request: UpdateVehicleAvailabilityDto): Observable<Vehicle>;
+  updateVehicleAvailability(
+    request: UpdateVehicleAvailabilityDto,
+  ): Observable<Vehicle>;
 
   /** vehicle location */
 
@@ -97,29 +98,45 @@ export interface VehicleServiceClient {
 
   findVehicleLocation(request: FindOneVehicleDto): Observable<VehicleLocation>;
 
-  findAllVehicleLocations(request: Empty): Observable<VehicleLocation>;
+  findAllVehicleLocations(request: Empty2): Observable<VehicleLocation>;
 
-  deleteVehicleLocation(request: FindOneVehicleDto): Observable<VehicleLocation>;
+  deleteVehicleLocation(
+    request: FindOneVehicleDto,
+  ): Observable<VehicleLocation>;
 }
 
 export interface VehicleServiceController {
   /** delivery vechile management */
 
-  createVehicle(request: CreateVehicleDto): Promise<Vehicle> | Observable<Vehicle> | Vehicle;
+  createVehicle(
+    request: CreateVehicleDto,
+  ): Promise<Vehicle> | Observable<Vehicle> | Vehicle;
 
-  findVehicleById(request: FindOneVehicleDto): Promise<Vehicle> | Observable<Vehicle> | Vehicle;
+  findVehicleById(
+    request: FindOneVehicleDto,
+  ): Promise<Vehicle> | Observable<Vehicle> | Vehicle;
 
-  findAllVehicles(request: Empty): Promise<VehicleList> | Observable<VehicleList> | VehicleList;
+  findAllVehicles(
+    request: Empty2,
+  ): Promise<VehicleList> | Observable<VehicleList> | VehicleList;
 
-  deleteVehicle(request: FindOneVehicleDto): Promise<Vehicle> | Observable<Vehicle> | Vehicle;
+  deleteVehicle(
+    request: FindOneVehicleDto,
+  ): Promise<Vehicle> | Observable<Vehicle> | Vehicle;
 
-  findVehicleByDriverId(request: FindVehicleByDriverIdDto): Promise<Vehicle> | Observable<Vehicle> | Vehicle;
+  findVehicleByDriverId(
+    request: FindVehicleByDriverIdDto,
+  ): Promise<Vehicle> | Observable<Vehicle> | Vehicle;
 
   /** find available vehicles */
 
-  findAvailableVehicles(request: Empty): Promise<VehicleList> | Observable<VehicleList> | VehicleList;
+  findAvailableVehicles(
+    request: Empty2,
+  ): Promise<VehicleList> | Observable<VehicleList> | VehicleList;
 
-  updateVehicleAvailability(request: UpdateVehicleAvailabilityDto): Promise<Vehicle> | Observable<Vehicle> | Vehicle;
+  updateVehicleAvailability(
+    request: UpdateVehicleAvailabilityDto,
+  ): Promise<Vehicle> | Observable<Vehicle> | Vehicle;
 
   /** vehicle location */
 
@@ -131,7 +148,9 @@ export interface VehicleServiceController {
     request: FindOneVehicleDto,
   ): Promise<VehicleLocation> | Observable<VehicleLocation> | VehicleLocation;
 
-  findAllVehicleLocations(request: Empty): Promise<VehicleLocation> | Observable<VehicleLocation> | VehicleLocation;
+  findAllVehicleLocations(
+    request: Empty2,
+  ): Promise<VehicleLocation> | Observable<VehicleLocation> | VehicleLocation;
 
   deleteVehicleLocation(
     request: FindOneVehicleDto,
@@ -154,13 +173,27 @@ export function VehicleServiceControllerMethods() {
       'deleteVehicleLocation',
     ];
     for (const method of grpcMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod('VehicleService', method)(constructor.prototype[method], method, descriptor);
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(
+        constructor.prototype,
+        method,
+      );
+      GrpcMethod('VehicleService', method)(
+        constructor.prototype[method],
+        method,
+        descriptor,
+      );
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod('VehicleService', method)(constructor.prototype[method], method, descriptor);
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(
+        constructor.prototype,
+        method,
+      );
+      GrpcStreamMethod('VehicleService', method)(
+        constructor.prototype[method],
+        method,
+        descriptor,
+      );
     }
   };
 }

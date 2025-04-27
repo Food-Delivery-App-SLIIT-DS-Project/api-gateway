@@ -5,22 +5,22 @@ service VehicleService{
     //delivery vechile management
     rpc CreateVehicle(CreateVehicleDto) returns (Vehicle){}
     rpc FindVehicleById(FindOneVehicleDto) returns (Vehicle){}
-    rpc FindAllVehicles(Empty) returns (VehicleList){}
+    rpc FindAllVehicles(Empty2) returns (VehicleList){}
     rpc DeleteVehicle(FindOneVehicleDto) returns (Vehicle){}
     rpc FindVehicleByDriverId(FindVehicleByDriverIdDto) returns (Vehicle){}
 
     // find available vehicles
-    rpc FindAvailableVehicles(Empty) returns (VehicleList){}
+    rpc FindAvailableVehicles(Empty2) returns (VehicleList){}
     rpc UpdateVehicleAvailability(UpdateVehicleAvailabilityDto) returns (Vehicle){}
 
     //vehicle location
     rpc UpdateVehicleLocation(VehicleLocation) returns (VehicleLocation){}
     rpc FindVehicleLocation(FindOneVehicleDto) returns (VehicleLocation){}
-    rpc FindAllVehicleLocations(Empty) returns (VehicleLocation){}
+    rpc FindAllVehicleLocations(Empty2) returns (VehicleLocation){}
     rpc DeleteVehicleLocation(FindOneVehicleDto) returns (VehicleLocation){}
 }
 
-message Empty {}
+message Empty2 {}
   
 message Vehicle{
     string vehicleId = 1; 
