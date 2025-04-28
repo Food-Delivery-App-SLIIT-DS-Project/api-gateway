@@ -39,4 +39,8 @@ create(createPaymentDto: CreatePaymentDto) {
   findAllPayments(): Observable<{ payments: PaymentResponse[] }> {
     return this.paymentServiceClient.FindAllPayments({});
   }
+
+  findPaymentsByUser(customerId: string): Observable<{ payments: PaymentResponse[] }> {
+    return this.paymentServiceClient.FindPaymentsByUser({ customerId });
+  }
 }

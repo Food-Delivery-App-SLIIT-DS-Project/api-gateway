@@ -70,6 +70,20 @@ export class PaymentController {
     }
   }
 
+  @Get('user/:customerId')
+  async findPaymentsByUser(@Param('customerId') customerId: string) {
+    try {
+      const result = await firstValueFrom(this.paymentService.findPaymentsByUser(customerId));
+      return {
+        code: 0,
+        msg: 'Payments fetched successfully',
+        data: result.payments,
+      };
+    } catch (error) {
+      return this.handleGrpcError(error);
+    }
+  }
+
   private handleGrpcError(error: any) {
     const code = error.code || status.UNKNOWN;
     const msg = error.message || 'Something went wrong';
