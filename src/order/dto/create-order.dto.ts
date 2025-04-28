@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsString, IsUUID, ValidateNested } from 'class-validator';
+import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
 
 // Reusable enum for order status
 export enum OrderStatus {
@@ -38,8 +38,8 @@ export class CreateOrderDto {
   @IsNotEmpty()
   restaurantId: string;
 
-  @IsString() // Same here: assuming deliveryId may be like "del_789"
-  @IsNotEmpty()
+  @IsString()
+  @IsOptional()
   deliveryId: string;
 
   @IsEnum(OrderStatus)

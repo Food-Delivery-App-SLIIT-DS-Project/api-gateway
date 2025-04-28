@@ -10,6 +10,18 @@ export class OrderService implements OnModuleInit {
   onModuleInit() {
     this.orderServiceClient = this.client.getService<OrderServiceClient>(ORDER_SERVICE_NAME);
   }
+
+  // get orders by restaurantId
+  getOrderByRestaurantId(data: { restaurantId: string }) {
+    // Logic to get orders by restaurantId
+    return this.orderServiceClient.getOrderByRestaurantId(data);
+  }
+  // get orders by customerId
+  getOrderByCustomerId(data: { customerId: string }) {
+    // Logic to get orders by customerId
+    return this.orderServiceClient.getOrderByCustomerId(data);
+  }
+
   placeOrder(data: CreateOrderDto) {
     // Logic to place an order
     return this.orderServiceClient.createOrder(data);

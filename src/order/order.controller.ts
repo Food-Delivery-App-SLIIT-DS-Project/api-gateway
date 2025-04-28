@@ -9,6 +9,8 @@ import { firstValueFrom } from 'rxjs';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
+  // create order
+
   @Post()
   async placedOrder(@Body() createOrderDto: CreateOrderDto) {
     try {
@@ -27,6 +29,27 @@ export class OrderController {
       return successResponse('All orders fetched', result);
     } catch (err) {
       return errorResponse(101, 'Failed to fetch orders');
+    }
+  }
+
+  // get orders by restauantId
+  @Get('restaurant/:id')
+  async getOrderByRestaurantId(@Param('id') restaurantId: string) {
+    try {
+      const result = await firstValueFrom(this.orderService.getOrderByRestaurantId({ restaurantId }));
+      return successResponse('Orders fetched by restaurant ID', result);
+    } catch (err) {
+      return errorResponse(100, 'Failed to fetch orders by restaurant ID');
+    }
+  }
+  // get orders by customerId
+  @Get('customer/:id')
+  async getOrderByCustomerId(@Param('id') customerId: string) {
+    try {
+      const result = await firstValueFrom(this.orderService.getOrderByCustomerId({ customerId }));
+      return successResponse('Orders fetched by customer ID', result);
+    } catch (err) {
+      return errorResponse(101, 'Failed to fetch orders by customer ID');
     }
   }
 
