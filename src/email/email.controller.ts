@@ -43,4 +43,57 @@ export class EmailController {
             );
         }
     }
+
+  @Post('driver-confirm')
+  async driverConfirm(@Body() email: EmailDto) {
+    try {
+      console.log('Driver confirming email with DTO:', email);
+      const response = await lastValueFrom(this.emailService.sendDriverConfirmEmail(email));
+      return response;
+    } catch (err) {
+      console.error('Error sending email:', err);
+      throw new HttpException(
+        {
+          code: '500',
+          message: 'Internal server error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+  @Post('driver-reject')
+  async driverReject(@Body() rejectionDto: RejectionEmailDto) {
+    try {
+      console.log('Driver rejecting email with DTO:', rejectionDto);
+      const response = await lastValueFrom(this.emailService.sendDriverRejectEmail(rejectionDto));
+      return response;
+    } catch (err) {
+      console.error('Error sending email:', err);
+      throw new HttpException(
+        {
+          code: '500',
+          message: 'Internal server error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+  @Post('refund-confirm')
+  async refundConfirm(@Body() rejectionDto: RejectionEmailDto) {
+    try {
+      console.log('Refund confirming email with DTO:', rejectionDto);
+      const response = await lastValueFrom(this.emailService.sendRefundEmail(rejectionDto));
+      return response;
+    } catch (err) {
+      console.error('Error sending email:', err);
+      throw new HttpException(
+        {
+          code: '500',
+          message: 'Internal server error',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }
+  

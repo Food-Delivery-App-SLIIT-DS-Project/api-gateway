@@ -3,8 +3,10 @@ package email;
 
 service EmailService {
     rpc sendRestaurantRegConfirmationEmail(EmailAddress) returns (Response);
-    rpc sendRefundConfirmationEmail(EmailAddress) returns (Response);
+    rpc sendRefundConfirmationEmail(RejectionEmail) returns (Response);
     rpc sendRejectionEmail(RejectionEmail) returns (Response);
+    rpc sendDriverConfirmEmail(EmailAddress) returns (Response);
+    rpc sendDriverRejectEmail(RejectionEmail) returns (Response);
   }
   
   message EmailAddress {
@@ -21,5 +23,7 @@ service EmailService {
     string reason = 2;
   }
   
+
+
 
 

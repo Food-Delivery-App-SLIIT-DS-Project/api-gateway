@@ -29,17 +29,25 @@ export const EMAIL_PACKAGE_NAME = "email";
 export interface EmailServiceClient {
   sendRestaurantRegConfirmationEmail(request: EmailAddress): Observable<Response>;
 
-  sendRefundConfirmationEmail(request: EmailAddress): Observable<Response>;
+  sendRefundConfirmationEmail(request: RejectionEmail): Observable<Response>;
 
   sendRejectionEmail(request: RejectionEmail): Observable<Response>;
+
+  sendDriverConfirmEmail(request: EmailAddress): Observable<Response>;
+
+  sendDriverRejectEmail(request: RejectionEmail): Observable<Response>;
 }
 
 export interface EmailServiceController {
   sendRestaurantRegConfirmationEmail(request: EmailAddress): Promise<Response> | Observable<Response> | Response;
 
-  sendRefundConfirmationEmail(request: EmailAddress): Promise<Response> | Observable<Response> | Response;
+  sendRefundConfirmationEmail(request: RejectionEmail): Promise<Response> | Observable<Response> | Response;
 
   sendRejectionEmail(request: RejectionEmail): Promise<Response> | Observable<Response> | Response;
+
+  sendDriverConfirmEmail(request: EmailAddress): Promise<Response> | Observable<Response> | Response;
+
+  sendDriverRejectEmail(request: RejectionEmail): Promise<Response> | Observable<Response> | Response;
 }
 
 export function EmailServiceControllerMethods() {
@@ -48,6 +56,8 @@ export function EmailServiceControllerMethods() {
       "sendRestaurantRegConfirmationEmail",
       "sendRefundConfirmationEmail",
       "sendRejectionEmail",
+      "sendDriverConfirmEmail",
+      "sendDriverRejectEmail",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

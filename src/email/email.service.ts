@@ -19,4 +19,14 @@ export class EmailService implements OnModuleInit {
   sendRegRejectEmail(request: RejectionEmail): Observable<Response> {
     return this.emailServiceClient.sendRejectionEmail(request);
   }
+
+  sendDriverConfirmEmail(request: EmailAddress): Observable<Response> {
+    return this.emailServiceClient.sendDriverConfirmEmail(request);
+  }
+  sendDriverRejectEmail(request: RejectionEmail): Observable<Response> {
+    return this.emailServiceClient.sendDriverRejectEmail(request);
+  }
+  sendRefundEmail(request: RejectionEmail): Observable<Response> {
+    return this.emailServiceClient.sendRefundConfirmationEmail(request);
+  }
 }
