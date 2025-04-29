@@ -1,56 +1,73 @@
-/* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Patch, Param, Delete, Inject } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Controller, Post, Body, Get, Delete, Param } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
-import { Observable } from 'rxjs';
-import { ClientGrpc } from '@nestjs/microservices';
-
-interface OrderServiceClient {
-  createOrder(data: any): Observable<any>;
-  findAllOrders(data: {}): Observable<any>;
-  findOneOrder(data: { orderId: string }): Observable<any>;
-  UpdateOrderStatus(data: { orderId: string, status: string }): Observable<any>;
-  removeOrder(data: { orderId: string }): Observable<any>;
-}
+import { errorResponse, successResponse } from 'utils/response';
+import { firstValueFrom } from 'rxjs';
 
 @Controller('order')
 export class OrderController {
-  private orderService: OrderServiceClient;
-
-  constructor(
-    @Inject('ORDER_SERVICE') private client: ClientGrpc
-  ) {}
-
-  onModuleInit() {
-    this.orderService = this.client.getService<OrderServiceClient>('OrderService');
-  }
+  constructor(private readonly orderService: OrderService) {}
 
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.createOrder(createOrderDto);
+  async placedOrder(@Body() createOrderDto: CreateOrderDto) {
+    try {
+      const result = await firstValueFrom(this.orderService.placeOrder(createOrderDto));
+      return successResponse('Order placed successfully', result);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      return errorResponse(100, 'Failed to place order');
+    }
   }
 
   @Get()
-  findAll() {
-    return this.orderService.findAllOrders({});
+  async findAllOrder() {
+    try {
+      const result = await firstValueFrom(this.orderService.findAllOrder());
+      return successResponse('All orders fetched', result);
+    } catch (err) {
+      return errorResponse(101, 'Failed to fetch orders');
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.orderService.findOneOrder({ orderId: id });
+  async findOneOrder(@Param('id') id: string) {
+    try {
+      const result = await firstValueFrom(this.orderService.findOneOrder(id));
+      return successResponse('Order found', result);
+    } catch (err) {
+      return errorResponse(102, 'Order not found');
+    }
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.orderService.UpdateOrderStatus({
-      orderId: id,
-      status: updateOrderDto.status
-    });
+  @Post('update/status')
+  async updateOrderStatus(@Body('orderId') id: string, @Body('status') status: string) {
+    try {
+      const result = await firstValueFrom(this.orderService.updateOrderStatus(id, status));
+      return successResponse('Order status updated', result);
+    } catch (err) {
+      return errorResponse(103, 'Failed to update status');
+    }
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.orderService.removeOrder({ orderId: id });
+  @Delete('remove')
+  async removeOrder(@Body('orderId') id: string) {
+    try {
+      const result = await firstValueFrom(this.orderService.removeOrder(id));
+      return successResponse('Order removed', result);
+    } catch (err) {
+      return errorResponse(104, 'Failed to remove order');
+    }
+  }
+
+  @Get('user/:userId')
+  async findUserOrders(@Param('userId') userId: string) {    
+    try {
+      console.log('Fetching orders for user:', userId);
+      const result = await firstValueFrom(this.orderService.findOrdersByUser(userId));
+      return successResponse('User orders fetched', result);
+    } catch (err) {
+      return errorResponse(105, 'Failed to fetch user orders');
+    }
   }
 }

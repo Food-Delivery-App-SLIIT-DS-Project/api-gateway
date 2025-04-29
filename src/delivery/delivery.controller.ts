@@ -1,34 +1,96 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+import { Body, Controller, HttpException, HttpStatus, Post } from '@nestjs/common';
 import { DeliveryService } from './delivery.service';
-import { CreateDeliveryDto } from './dto/create-delivery.dto';
-import { UpdateDeliveryDto } from './dto/update-delivery.dto';
+import { GoOnlineDto } from './dto/goOnline.dto';
+import { successResponse, errorResponse } from '../../utils/response'; // Adjust path if needed
+import { catchError, throwError, lastValueFrom } from 'rxjs';
 
 @Controller('delivery')
 export class DeliveryController {
   constructor(private readonly deliveryService: DeliveryService) {}
 
-  @Post()
-  create(@Body() createDeliveryDto: CreateDeliveryDto) {
-    return this.deliveryService.create(createDeliveryDto);
+  // goOnline -------------
+  @Post('go-online')
+  async goOnline(@Body() request: GoOnlineDto) {
+    try {
+      const result = await lastValueFrom(
+        this.deliveryService.goOnline(request).pipe(
+          catchError((err) => {
+            console.error('gRPC Error (goOnline):', err);
+            return throwError(
+              () =>
+                new HttpException(
+                  errorResponse(500, err?.message || 'Internal server error'),
+                  HttpStatus.INTERNAL_SERVER_ERROR,
+                ),
+            );
+          }),
+        ),
+      );
+
+      return successResponse('Driver is online', result);
+    } catch (err) {
+      console.error('Caught Error (goOnline):', err);
+      if (err instanceof HttpException) throw err;
+
+      throw new HttpException(errorResponse(500, 'Unexpected error occurred'), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  @Get()
-  findAll() {
-    return this.deliveryService.findAll();
+  // goOffline -------------
+  @Post('go-offline')
+  async goOffline(@Body() body: { userId: string }) {
+    try {
+      const result = await lastValueFrom(
+        this.deliveryService.goOffline({ userId: body.userId }).pipe(
+          catchError((err) => {
+            console.error('gRPC Error (goOffline):', err);
+            return throwError(
+              () =>
+                new HttpException(
+                  errorResponse(500, err?.message || 'Internal server error'),
+                  HttpStatus.INTERNAL_SERVER_ERROR,
+                ),
+            );
+          }),
+        ),
+      );
+
+      return successResponse('Driver is offline', result);
+    } catch (err) {
+      console.error('Caught Error (goOffline):', err);
+      if (err instanceof HttpException) throw err;
+
+      throw new HttpException(errorResponse(500, 'Unexpected error occurred'), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.deliveryService.findOne(+id);
-  }
+  // updateLocation -------------
+  @Post('update-location')
+  async updateLocation(@Body() request: GoOnlineDto) {
+    try {
+      const result = await lastValueFrom(
+        this.deliveryService.updateLocation(request).pipe(
+          catchError((err) => {
+            console.error('gRPC Error (updateLocation):', err);
+            return throwError(
+              () =>
+                new HttpException(
+                  errorResponse(500, err?.message || 'Internal server error'),
+                  HttpStatus.INTERNAL_SERVER_ERROR,
+                ),
+            );
+          }),
+        ),
+      );
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDeliveryDto: UpdateDeliveryDto) {
-    return this.deliveryService.update(+id, updateDeliveryDto);
-  }
+      return successResponse('Location updated', result);
+    } catch (err) {
+      console.error('Caught Error (updateLocation):', err);
+      if (err instanceof HttpException) throw err;
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.deliveryService.remove(+id);
+      throw new HttpException(errorResponse(500, 'Unexpected error occurred'), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

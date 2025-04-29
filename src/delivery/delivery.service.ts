@@ -1,26 +1,34 @@
-import { Injectable } from '@nestjs/common';
-import { CreateDeliveryDto } from './dto/create-delivery.dto';
-import { UpdateDeliveryDto } from './dto/update-delivery.dto';
+import { Inject, Injectable } from '@nestjs/common';
+import {
+  DELIVERY_SERVICE_NAME,
+  DeliveryServiceClient,
+  OfflineStatusRequest,
+  OnlineStatusRequest,
+  UpdateLocationRequest,
+} from './types/delivery';
+import { ClientGrpc } from '@nestjs/microservices';
 
 @Injectable()
 export class DeliveryService {
-  create(createDeliveryDto: CreateDeliveryDto) {
-    return 'This action adds a new delivery';
+  private deliveryService: DeliveryServiceClient;
+  constructor(@Inject(DELIVERY_SERVICE_NAME) private readonly client: ClientGrpc) {}
+
+  onModuleInit() {
+    this.deliveryService = this.client.getService<DeliveryServiceClient>(DELIVERY_SERVICE_NAME);
   }
 
-  findAll() {
-    return `This action returns all delivery`;
+  // goOnline -------------
+  goOnline(request: OnlineStatusRequest) {
+    return this.deliveryService.goOnline(request);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} delivery`;
+  // goOffline -------------
+  goOffline(request: OfflineStatusRequest) {
+    return this.deliveryService.goOffline(request);
   }
 
-  update(id: number, updateDeliveryDto: UpdateDeliveryDto) {
-    return `This action updates a #${id} delivery`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} delivery`;
+  // updateLocation -------------
+  updateLocation(request: UpdateLocationRequest) {
+    return this.deliveryService.updateLocation(request);
   }
 }

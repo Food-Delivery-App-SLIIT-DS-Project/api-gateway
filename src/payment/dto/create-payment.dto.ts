@@ -1,16 +1,17 @@
-import { IsUUID, IsNumber, IsString, IsNotEmpty } from 'class-validator';
+import { IsNumber, IsString, IsNotEmpty } from 'class-validator';
 
 export class CreatePaymentDto {
-  @IsUUID()
   @IsNotEmpty()
   orderId: string;
 
-  @IsUUID()
   @IsNotEmpty()
   customerId: string;
 
   @IsNumber()
   amount: number;
+  
+  @IsString()
+  status: string = 'PENDING';
 
   @IsString()
   @IsNotEmpty()
@@ -20,4 +21,3 @@ export class CreatePaymentDto {
   @IsNotEmpty()
   transactionId: string;
 }
-

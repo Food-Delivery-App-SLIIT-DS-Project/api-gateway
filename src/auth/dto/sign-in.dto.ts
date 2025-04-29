@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { IsNotEmpty, IsString, IsEmail } from 'class-validator';
+import { IsNotEmpty, IsString, IsEmail, IsOptional } from 'class-validator';
 
 class SignInDto {
   @IsNotEmpty()
@@ -9,6 +9,10 @@ class SignInDto {
   @IsNotEmpty()
   @IsString()
   password: string;
+
+  @IsOptional()
+  @IsString()
+  fcmToken?: string;
 }
 
 export { SignInDto };
