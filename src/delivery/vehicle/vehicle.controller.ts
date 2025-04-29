@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post } from '@nestjs/common';
 
 import { lastValueFrom } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -129,7 +129,7 @@ export class VehicleController {
 
   // get vehicle by id
   @Get(':id')
-  async getVehicleById(@Body('id') vehicleId: string) {
+  async getVehicleById(@Param('id') vehicleId: string) {
     try {
       const vehicle = await lastValueFrom(
         this.vehicleService.getVehicleById({ vehicleId }).pipe(
@@ -186,7 +186,7 @@ export class VehicleController {
 
   // get vehicle by driver id
   @Get('driver/:id')
-  async getVehicleByDriverId(@Body('id') driverId: string) {
+  async getVehicleByDriverId(@Param('id') driverId: string) {
     try {
       const vehicle = await lastValueFrom(
         this.vehicleService.getVehicleByDriverId({ driverId }).pipe(
@@ -405,7 +405,7 @@ export class VehicleController {
 
   // findVehicleLocation ------------
   @Get('location/:id')
-  async findVehicleLocation(@Body('id') vehicleId: string) {
+  async findVehicleLocation(@Param('id') vehicleId: string) {
     try {
       const vehicle = await lastValueFrom(
         this.vehicleService.findVehicleLocation({ vehicleId }).pipe(
@@ -474,13 +474,15 @@ export class VehicleController {
         ),
       );
 
-      const formattedVehicles = vehicleList.vehicles.map((v) => ({
-        tracking_id: v.trackingId,
-        vehicle_id: v.vehicleId,
-        latitude: v.latitude,
-        longitude: v.longitude,
-        updated_at: v.updatedAt,
-      }));
+      const formattedVehicles = Array.isArray(vehicleList.vehicleId)
+        ? vehicleList.vehicleId.map((v) => ({
+            tracking_id: v.trackingId,
+            vehicle_id: v.vehicleId,
+            latitude: v.latitude,
+            longitude: v.longitude,
+            updated_at: v.updatedAt,
+          }))
+        : [];
 
       const response = successResponse('success', formattedVehicles);
       return response;
@@ -499,8 +501,8 @@ export class VehicleController {
   }
 
   // deleteVehicleLocation
-  @Delete('location')
-  async deleteVehicleLocation(@Body('id') vehicleId: string) {
+  @Delete('location/:id')
+  async deleteVehicleLocation(@Param('id') vehicleId: string) {
     try {
       const vehicle = await lastValueFrom(
         this.vehicleService.deleteVehicleLocation({ vehicleId }).pipe(

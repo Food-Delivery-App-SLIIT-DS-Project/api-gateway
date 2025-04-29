@@ -24,6 +24,7 @@ import { Empty } from 'src/user/types';
 
 @Injectable()
 export class RestaurantService implements OnModuleInit {
+
   private restaurantServiceClient: RestaurantServiceClient;
 
   constructor(@Inject(RESTAURANT_SERVICE_NAME) private readonly client: ClientGrpc) {}

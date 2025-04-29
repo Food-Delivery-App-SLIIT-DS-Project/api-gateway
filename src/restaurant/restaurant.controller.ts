@@ -7,6 +7,7 @@ import { RestaurantResponse } from './types/response';
 import { catchError, lastValueFrom, throwError } from 'rxjs';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
+import { UpdateIsVerifiedRequest } from './types/restaurant';
 import { RatingIncrease } from './types/restaurant';
 
 @Controller('restaurant')
