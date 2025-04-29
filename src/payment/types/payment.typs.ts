@@ -10,6 +10,7 @@ export interface CreatePaymentRequest {
   orderId: string;
   customerId: string;
   amount: number;
+  status: string;
   paymentMethod: string;
   transactionId?: string;
 }

@@ -17,6 +17,10 @@ export interface OrderId {
   orderId: string;
 }
 
+export interface UserId {
+  userId: string;
+}
+
 export interface UpdateStatusRequest {
   orderId: string;
   status: string;
@@ -73,6 +77,8 @@ export interface OrderServiceClient {
   updateOrderStatus(request: UpdateStatusRequest): Observable<OrderResponse>;
 
   removeOrder(request: OrderId): Observable<RemoveResponse>;
+
+  findOrdersByUser(request: UserId): Observable<OrderList>;
 }
 
 export interface OrderServiceController {
@@ -85,11 +91,13 @@ export interface OrderServiceController {
   updateOrderStatus(request: UpdateStatusRequest): Promise<OrderResponse> | Observable<OrderResponse> | OrderResponse;
 
   removeOrder(request: OrderId): Promise<RemoveResponse> | Observable<RemoveResponse> | RemoveResponse;
+
+  findOrdersByUser(request: UserId): Promise<OrderList> | Observable<OrderList> | OrderList;
 }
 
 export function OrderServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["createOrder", "findAllOrders", "findOneOrder", "updateOrderStatus", "removeOrder"];
+    const grpcMethods: string[] = ["createOrder", "findAllOrders", "findOneOrder", "updateOrderStatus", "removeOrder", "findOrdersByUser"];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("OrderService", method)(constructor.prototype[method], method, descriptor);

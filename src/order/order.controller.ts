@@ -59,4 +59,15 @@ export class OrderController {
       return errorResponse(104, 'Failed to remove order');
     }
   }
+
+  @Get('user/:userId')
+  async findUserOrders(@Param('userId') userId: string) {    
+    try {
+      console.log('Fetching orders for user:', userId);
+      const result = await firstValueFrom(this.orderService.findOrdersByUser(userId));
+      return successResponse('User orders fetched', result);
+    } catch (err) {
+      return errorResponse(105, 'Failed to fetch user orders');
+    }
+  }
 }

@@ -34,4 +34,10 @@ export class OrderService implements OnModuleInit {
     // Logic to remove an order
     return this.orderServiceClient.removeOrder({ orderId: id });
   }
+
+  // get all order by userId ----------------
+  findOrdersByUser(userId: string) {
+    // Logic to get all orders by userId
+    return this.orderServiceClient.findOrdersByUser({ userId });
+  }
 }

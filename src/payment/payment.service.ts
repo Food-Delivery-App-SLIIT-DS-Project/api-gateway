@@ -22,6 +22,7 @@ create(createPaymentDto: CreatePaymentDto) {
       orderId: createPaymentDto.orderId,
       customerId: createPaymentDto.customerId,
       amount: createPaymentDto.amount,
+      status: createPaymentDto.status || 'PENDING',
       paymentMethod: createPaymentDto.paymentMethod,
       transactionId: createPaymentDto.transactionId,
     };

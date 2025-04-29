@@ -8,12 +8,17 @@ service OrderService {
   rpc FindOneOrder (OrderId) returns (OrderResponse);
   rpc UpdateOrderStatus (UpdateStatusRequest) returns (OrderResponse);
   rpc RemoveOrder (OrderId) returns (RemoveResponse);
+  rpc FindOrdersByUser (UserId) returns (OrderList);
 }
 
 message Empty {}
 
 message OrderId {
   string orderId = 1;
+}
+
+message UserId {
+  string userId = 1;
 }
 
 message UpdateStatusRequest {

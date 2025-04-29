@@ -9,6 +9,9 @@ export class CreatePaymentDto {
 
   @IsNumber()
   amount: number;
+  
+  @IsString()
+  status: string = 'PENDING';
 
   @IsString()
   @IsNotEmpty()
