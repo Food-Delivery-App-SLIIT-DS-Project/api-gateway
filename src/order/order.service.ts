@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ORDER_SERVICE_NAME, OrderServiceClient } from './types/order';
 import { ClientGrpc } from '@nestjs/microservices';
