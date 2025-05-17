@@ -80,7 +80,7 @@ jobs:
               - protocol: TCP
                 port: 3000
                 targetPort: 3000
-            type: ClusterIP
+                nodePort: 30275
           EOF
 
       - name: Check generated files
