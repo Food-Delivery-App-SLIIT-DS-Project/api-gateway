@@ -15,8 +15,17 @@ export class OrderController {
   @Post()
   async placedOrder(@Body() createOrderDto: CreateOrderDto) {
     console.log('Placing order with DTO:', createOrderDto);
+    const dto = createOrderDto;
+
     try {
-      const result = await firstValueFrom(this.orderService.placeOrder(createOrderDto));
+      // Ensure conversion to gRPC-safe types
+      const grpcPayload = {
+        ...dto,
+        status: dto.status.toString(), // Convert enum to string
+        deliveryId: dto.deliveryId || '', // Avoid undefined
+      };
+
+      const result = await firstValueFrom(this.orderService.placeOrder(grpcPayload));
       return successResponse('Order placed successfully', result);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {

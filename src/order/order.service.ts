@@ -2,7 +2,6 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ORDER_SERVICE_NAME, OrderServiceClient } from './types/order';
 import { ClientGrpc } from '@nestjs/microservices';
-import { CreateOrderDto } from './dto/create-order.dto';
 
 @Injectable()
 export class OrderService implements OnModuleInit {
@@ -23,7 +22,7 @@ export class OrderService implements OnModuleInit {
     return this.orderServiceClient.getOrderByCustomerId(data);
   }
 
-  placeOrder(data: CreateOrderDto) {
+  placeOrder(data: any) {
     // Logic to place an order
     // console.log('Placing order with data:', data);
     return this.orderServiceClient.createOrder(data);
