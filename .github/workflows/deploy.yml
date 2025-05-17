@@ -39,7 +39,6 @@ jobs:
           echo "${{ secrets.API_GATEWAY_SERVICE_SECRET_YAML_BASE64 }}" | base64 -d > api-gateway-secret.yaml
 
       - name: Create api-gateway.yaml (Deployment + Service)
-        shell: bash
         run: |
           cat <<EOF > api-gateway.yaml
           apiVersion: apps/v1
@@ -74,6 +73,7 @@ jobs:
             name: api-gateway
             namespace: api-gateway
           spec:
+            type: NodePort
             selector:
               app: api-gateway
             ports:
@@ -85,7 +85,6 @@ jobs:
 
       - name: Check generated files
         run: |
-          ls -la
           echo "--- namespace.yaml ---" && cat namespace.yaml
           echo "--- api-gateway-secret.yaml ---" && cat api-gateway-secret.yaml
           echo "--- api-gateway.yaml ---" && cat api-gateway.yaml
