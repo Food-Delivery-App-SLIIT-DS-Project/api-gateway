@@ -1,4 +1,4 @@
-name: Deploy Api Gateway to K3s
+name: Deploy api-gateway Service to K3s
 
 on:
   push:
@@ -25,15 +25,30 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Create api-gateway-deployment.yaml
+      - name: Create namespace.yaml
+        run: |
+          cat <<EOF > namespace.yaml
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: api-gateway
+          EOF
+
+      - name: Write api-gateway-secret.yaml from GitHub Secret
+        run: |
+          echo "${{ secrets.API_GATEWAY_SERVICE_SECRET_YAML_BASE64 }}" | base64 -d > api-gateway-secret.yaml
+
+      - name: Create api-gateway.yaml (Deployment + Service)
         shell: bash
         run: |
-          cat <<EOF > api-gateway-deployment.yaml
+          cat <<EOF > api-gateway.yaml
           apiVersion: apps/v1
           kind: Deployment
           metadata:
             name: api-gateway
-            namespace: default
+            namespace: api-gateway
+            labels:
+              app: api-gateway
           spec:
             replicas: 1
             selector:
@@ -45,24 +60,35 @@ jobs:
                   app: api-gateway
               spec:
                 containers:
-                - name: api-gateway
-                  image: ${IMAGE_NAME}:${IMAGE_TAG}
-                  ports:
-                  - containerPort: 8082
-                  envFrom:
-                  - secretRef:
-                      name: api-gateway-secret
+                  - name: api-gateway
+                    image: ${IMAGE_NAME}:${IMAGE_TAG}
+                    ports:
+                      - containerPort: 3000
+                    envFrom:
+                      - secretRef:
+                          name: api-gateway-secret
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: api-gateway
+            namespace: api-gateway
+          spec:
+            selector:
+              app: api-gateway
+            ports:
+              - protocol: TCP
+                port: 3000
+                targetPort: 3000
+            type: ClusterIP
           EOF
 
-      - name: Write api-gateway-secret.yaml from GitHub Secret
-        run: |
-          echo "${{ secrets.API_GATEWAY_SECRET_YAML_BASE64 }}" | base64 -d > api-gateway-secret.yaml
-
-      - name: Check if files exist
+      - name: Check generated files
         run: |
           ls -la
-          echo "api-gateway-deployment.yaml:" && cat api-gateway-deployment.yaml
-          echo "api-gateway-secret.yaml:" && cat api-gateway-secret.yaml || echo "Missing secret file"
+          echo "--- namespace.yaml ---" && cat namespace.yaml
+          echo "--- api-gateway-secret.yaml ---" && cat api-gateway-secret.yaml
+          echo "--- api-gateway.yaml ---" && cat api-gateway.yaml
 
       - name: Build and push Docker image
         run: |
@@ -72,7 +98,7 @@ jobs:
       - name: Install OpenSSH client
         run: sudo apt-get update && sudo apt-get install -y openssh-client
 
-      - name: Set up SSH key (RSA)
+      - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
@@ -85,9 +111,10 @@ jobs:
       - name: Deploy to EC2
         run: |
           ssh ubuntu@${{ secrets.EC2_HOST }} "mkdir -p ~/deploy/api-gateway"
-          scp api-gateway-*.yaml ubuntu@${{ secrets.EC2_HOST }}:~/deploy/api-gateway/
+          scp namespace.yaml api-gateway-secret.yaml api-gateway.yaml ubuntu@${{ secrets.EC2_HOST }}:~/deploy/api-gateway/
           ssh ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
             cd ~/deploy/api-gateway
+            sudo kubectl apply -f namespace.yaml
             sudo kubectl apply -f api-gateway-secret.yaml
-            sudo kubectl apply -f api-gateway-deployment.yaml
+            sudo kubectl apply -f api-gateway.yaml
           EOF
