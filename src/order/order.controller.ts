@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Controller, Post, Body, Get, Delete, Param } from '@nestjs/common';
 import { OrderService } from './order.service';
@@ -13,11 +14,13 @@ export class OrderController {
 
   @Post()
   async placedOrder(@Body() createOrderDto: CreateOrderDto) {
+    console.log('Placing order with DTO:', createOrderDto);
     try {
       const result = await firstValueFrom(this.orderService.placeOrder(createOrderDto));
       return successResponse('Order placed successfully', result);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
+      console.error('Error placing order:', err);
       return errorResponse(100, 'Failed to place order');
     }
   }

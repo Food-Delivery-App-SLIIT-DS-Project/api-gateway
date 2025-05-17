@@ -25,6 +25,7 @@ export class OrderService implements OnModuleInit {
 
   placeOrder(data: CreateOrderDto) {
     // Logic to place an order
+    // console.log('Placing order with data:', data);
     return this.orderServiceClient.createOrder(data);
   }
   // get all order ----------------
