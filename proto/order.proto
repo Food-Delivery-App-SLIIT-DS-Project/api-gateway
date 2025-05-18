@@ -38,8 +38,8 @@ message OrderItemInput {
 message CreateOrderRequest {
   string customerId = 1;
   string restaurantId = 2;
-  optional string deliveryId  = 3;
-    optional string status = 4;
+  optional string deliveryId = 3;
+  optional string status = 4;
     double totalPrice = 5;
   repeated OrderItemInput items = 6;
 }
