@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { ORDER_SERVICE_NAME, OrderServiceClient } from './types/order';
+import { CreateOrderRequest, ORDER_SERVICE_NAME, OrderServiceClient } from './types/order';
 import { ClientGrpc } from '@nestjs/microservices';
 
 @Injectable()
@@ -22,9 +22,7 @@ export class OrderService implements OnModuleInit {
     return this.orderServiceClient.getOrderByCustomerId(data);
   }
 
-  placeOrder(data: any) {
-    // Logic to place an order
-    // console.log('Placing order with data:', data);
+  placeOrder(data: CreateOrderRequest) {
     return this.orderServiceClient.createOrder(data);
   }
   // get all order ----------------

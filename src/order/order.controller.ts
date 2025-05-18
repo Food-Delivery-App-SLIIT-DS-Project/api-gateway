@@ -5,6 +5,7 @@ import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { errorResponse, successResponse } from 'utils/response';
 import { firstValueFrom } from 'rxjs';
+import { CreateOrderRequest } from './types/order';
 
 @Controller('order')
 export class OrderController {
@@ -17,13 +18,17 @@ export class OrderController {
     console.log('Placing order with DTO:', createOrderDto);
     const dto = createOrderDto;
 
+    const grpcPayload:CreateOrderRequest = {
+      customerId: dto.customerId,
+      restaurantId: dto.restaurantId,
+      items: dto.items,
+      totalPrice: dto.totalPrice,
+      status: dto.status,
+      deliveryId: dto.deliveryId || '', // Avoid undefined
+    };
+
     try {
-      // Ensure conversion to gRPC-safe types
-      const grpcPayload = {
-        ...dto,
-        status: dto.status.toString(), // Convert enum to string
-        deliveryId: dto.deliveryId || '', // Avoid undefined
-      };
+
 
       const result = await firstValueFrom(this.orderService.placeOrder(grpcPayload));
       return successResponse('Order placed successfully', result);
