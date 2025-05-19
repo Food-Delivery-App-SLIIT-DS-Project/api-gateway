@@ -243,4 +243,109 @@ export class RestaurantController {
       );
     }
   }
+
+  //--- new -----------------
+  @Get('by-name/:name')
+async getByName(@Param('name') name: string) {
+  try {
+    const restaurant = await lastValueFrom(this.restaurantService.getRestaurantByName({ name }));
+    return {
+      code: '200',
+      message: 'success',
+      data: restaurant,
+    };
+  } catch (err) {
+    console.error('Error fetching by name:', err);
+    throw new HttpException({ code: '500', message: 'Internal server error' }, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
+
+@Get('by-cuisine/:cuisine')
+async getByCuisine(@Param('cuisine') cuisine: string) {
+  try {
+    const list = await lastValueFrom(this.restaurantService.getRestaurantsByCuisine({ cuisine }));
+    return { code: '200', message: 'success', data: list.restaurants };
+  } catch (err) {
+    console.error('Error fetching by cuisine:', err);
+    throw new HttpException({ code: '500', message: 'Internal server error' }, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
+
+@Get('by-user/:userId')
+async getByUser(@Param('userId') userId: string) {
+  try {
+    const list = await lastValueFrom(this.restaurantService.getRestaurantsByUserId({ userId }));
+    return { code: '200', message: 'success', data: list.restaurants };
+  } catch (err) {
+    console.error('Error fetching by user ID:', err);
+    throw new HttpException({ code: '500', message: 'Internal server error' }, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
+
+@Patch('verify/:id')
+async updateIsVerified(@Param('id') id: string, @Body() body: { isVerified: boolean }) {
+  try {
+    const updated = await lastValueFrom(this.restaurantService.updateIsVerified({ restaurantId: id, isVerified: body.isVerified }));
+    return { code: '200', message: 'success', data: updated };
+  } catch (err) {
+    console.error('Error updating verification:', err);
+    throw new HttpException({ code: '500', message: 'Internal server error' }, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
+
+@Patch('open/:id')
+async updateIsOpen(@Param('id') id: string, @Body() body: { isOpen: boolean }) {
+  try {
+    const updated = await lastValueFrom(this.restaurantService.updateIsOpen({ restaurantId: id, isOpen: body.isOpen }));
+    return { code: '200', message: 'success', data: updated };
+  } catch (err) {
+    console.error('Error updating open status:', err);
+    throw new HttpException({ code: '500', message: 'Internal server error' }, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
+
+@Get('by-location')
+async getByLocation(@Body() body: { latitude: number; longitude: number; radius: number }) {
+  try {
+    const list = await lastValueFrom(this.restaurantService.getRestaurantsByLocation(body));
+    return { code: '200', message: 'success', data: list.restaurants };
+  } catch (err) {
+    console.error('Error fetching by location:', err);
+    throw new HttpException({ code: '500', message: 'Internal server error' }, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
+
+@Get('with-filters')
+async getWithFilters() {
+  try {
+    const list = await lastValueFrom(this.restaurantService.getAllRestaurantsWithFilters());
+    return { code: '200', message: 'success', data: list.restaurants };
+  } catch (err) {
+    console.error('Error fetching with filters:', err);
+    throw new HttpException({ code: '500', message: 'Internal server error' }, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
+
+@Patch('increase-rating/:id')
+async increaseRating(@Param('id') restaurantId: string) {
+  try {
+    await lastValueFrom(this.restaurantService.increaseRating({ restaurantId }));
+    return { code: '200', message: 'Rating increased', data: {} };
+  } catch (err) {
+    console.error('Error increasing rating:', err);
+    throw new HttpException({ code: '500', message: 'Internal server error' }, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
+
+@Patch('decrease-rating/:id')
+async decreaseRating(@Param('id') restaurantId: string) {
+  try {
+    await lastValueFrom(this.restaurantService.decreaseRating({ restaurantId }));
+    return { code: '200', message: 'Rating decreased', data: {} };
+  } catch (err) {
+    console.error('Error decreasing rating:', err);
+    throw new HttpException({ code: '500', message: 'Internal server error' }, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
+
 }

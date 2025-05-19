@@ -42,4 +42,42 @@ export class RestaurantService implements OnModuleInit {
   deleteRestaurant(request: RestaurantId) {
     return this.restaurantServiceClient.deleteRestaurant(request);
   }
+
+  // --------------- new----------------
+  getRestaurantByName(request: { name: string }): Observable<RestaurantResponse> {
+  return this.restaurantServiceClient.getRestaurantByName(request);
+}
+
+getRestaurantsByCuisine(request: { cuisine: string }): Observable<RestaurantList> {
+  return this.restaurantServiceClient.getRestaurantsByCuisine(request);
+}
+
+getRestaurantsByUserId(request: { userId: string }): Observable<RestaurantList> {
+  return this.restaurantServiceClient.getRestaurantsByUserId(request);
+}
+
+updateIsVerified(request: { restaurantId: string; isVerified: boolean }): Observable<RestaurantResponse> {
+  return this.restaurantServiceClient.updateIsVerified(request);
+}
+
+updateIsOpen(request: { restaurantId: string; isOpen: boolean }): Observable<RestaurantResponse> {
+  return this.restaurantServiceClient.updateIsOpen(request);
+}
+
+getRestaurantsByLocation(request: { latitude: number; longitude: number; radius: number }): Observable<RestaurantList> {
+  return this.restaurantServiceClient.getRestaurantsByLocation(request);
+}
+
+getAllRestaurantsWithFilters(): Observable<RestaurantList> {
+  return this.restaurantServiceClient.getAllRestaurantsWithFilters({});
+}
+
+increaseRating(request: { restaurantId: string }): Observable<any> {
+  return this.restaurantServiceClient.updateRating(request);
+}
+
+decreaseRating(request: { restaurantId: string }): Observable<any> {
+  return this.restaurantServiceClient.decreaseRating(request);
+}
+
 }
