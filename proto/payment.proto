@@ -6,6 +6,11 @@ service PaymentService {
   rpc CreatePayment (CreatePaymentRequest) returns (PaymentResponse);
   rpc GetPayment (GetPaymentRequest) returns (PaymentResponse);
   rpc RefundPayment (RefundPaymentRequest) returns (PaymentResponse);
+   rpc UpdatePaymentStatus (UpdatePaymentStatusRequest) returns (PaymentResponse);
+}
+message UpdatePaymentStatusRequest {
+  string transactionId = 1;
+  string status = 2;
 }
 
 message CreatePaymentRequest {
@@ -13,7 +18,7 @@ message CreatePaymentRequest {
   string customerId = 2;
   double amount = 3;
   string paymentMethod = 4;
-  string transactionId = 5;
+  // string transactionId = 5;
 }
 
 message GetPaymentRequest {
