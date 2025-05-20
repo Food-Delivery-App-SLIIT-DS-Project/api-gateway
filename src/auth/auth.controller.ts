@@ -16,7 +16,7 @@ export class AuthController {
 
   @Post('signup')
   async create(@Body() signupDto: SignupDto): Promise<ApiResponse<AuthData>> {
-    console.log('signupDto', signupDto);
+    // console.log('signupDto', signupDto);
     const result = await this.authService.signUp(signupDto);
     return {
       code: 0,
@@ -36,7 +36,7 @@ export class AuthController {
   }
   @Post('signin')
   async signIn(@Body() signInDto: SignInDto): Promise<ApiResponse<AuthData>> {
-    console.log('signupDto', signInDto);
+    // console.log('signupDto', signInDto);
     const result = await this.authService.signIn({
       ...signInDto,
       fcmToken: signInDto.fcmToken ?? undefined,
@@ -63,7 +63,7 @@ export class AuthController {
   async logout(@Request() req, @Body() body: { refreshToken: string }) {
     const userId = req.user.userId;
     const { refreshToken } = body;
-    console.log('userId', req.user);
+    // console.log('userId', req.user);
     // Optionally: validate the refreshToken belongs to this user (if stored in DB)
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     await this.authService.logout(refreshToken, userId);

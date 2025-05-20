@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { IsNumber, IsString, IsNotEmpty } from 'class-validator';
 
 export class CreatePaymentDto {
@@ -13,8 +14,4 @@ export class CreatePaymentDto {
   @IsString()
   @IsNotEmpty()
   paymentMethod: string;
-
-  @IsString()
-  @IsNotEmpty()
-  transactionId: string;
 }

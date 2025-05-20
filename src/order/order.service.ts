@@ -1,7 +1,7 @@
+/* eslint-disable prettier/prettier */
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { ORDER_SERVICE_NAME, OrderServiceClient } from './types/order';
+import { CreateOrderRequest, ORDER_SERVICE_NAME, OrderServiceClient } from './types/order';
 import { ClientGrpc } from '@nestjs/microservices';
-import { CreateOrderDto } from './dto/create-order.dto';
 
 @Injectable()
 export class OrderService implements OnModuleInit {
@@ -10,8 +10,19 @@ export class OrderService implements OnModuleInit {
   onModuleInit() {
     this.orderServiceClient = this.client.getService<OrderServiceClient>(ORDER_SERVICE_NAME);
   }
-  placeOrder(data: CreateOrderDto) {
-    // Logic to place an order
+
+  // get orders by restaurantId
+  getOrderByRestaurantId(data: { restaurantId: string }) {
+    // Logic to get orders by restaurantId
+    return this.orderServiceClient.getOrderByRestaurantId(data);
+  }
+  // get orders by customerId
+  getOrderByCustomerId(data: { customerId: string }) {
+    // Logic to get orders by customerId
+    return this.orderServiceClient.getOrderByCustomerId(data);
+  }
+
+  placeOrder(data: CreateOrderRequest) {
     return this.orderServiceClient.createOrder(data);
   }
   // get all order ----------------

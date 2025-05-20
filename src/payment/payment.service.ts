@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
@@ -17,16 +18,15 @@ export class PaymentService implements OnModuleInit {
   onModuleInit() {
     this.paymentServiceClient = this.client.getService<PaymentServiceGrpc>('PaymentService');
   }
-create(createPaymentDto: CreatePaymentDto) {
+  create(createPaymentDto: CreatePaymentDto) {
     const createPaymentRequest: CreatePaymentRequest = {
       orderId: createPaymentDto.orderId,
       customerId: createPaymentDto.customerId,
       amount: createPaymentDto.amount,
       paymentMethod: createPaymentDto.paymentMethod,
-      transactionId: createPaymentDto.transactionId,
     };
-    // console.log('createPaymentRequest', createPaymentRequest);
-    return  this.paymentServiceClient.CreatePayment(createPaymentRequest);
+    console.log('createPaymentRequest', createPaymentRequest);
+    return this.paymentServiceClient.CreatePayment(createPaymentRequest);
   }
 
   getPayment(paymentId: string) {
@@ -42,5 +42,15 @@ create(createPaymentDto: CreatePaymentDto) {
 
   findPaymentsByUser(customerId: string): Observable<{ payments: PaymentResponse[] }> {
     return this.paymentServiceClient.FindPaymentsByUser({ customerId });
+  }
+
+  // update payment status----------------
+  updatePaymentStatus(id: string, status: string) {
+    const payload = {
+      transactionId: id,
+      status,
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    return this.paymentServiceClient.UpdatePaymentStatus(payload);
   }
 }

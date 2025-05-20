@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable prettier/prettier */
@@ -123,6 +124,7 @@ export class RestaurantController {
         data: formattedData,
       };
     } catch (err) {
+      console.error('Error fetching all restaurants:', err);
       throw new HttpException(
         {
           code: '500',

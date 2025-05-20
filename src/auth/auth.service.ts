@@ -37,7 +37,7 @@ export class AuthService implements OnModuleInit {
   }
 
   async logout(refreshToken: string, userId:string): Promise<{ message: string }> {
-    console.log('logout function', refreshToken, userId);
+    // console.log('logout function', refreshToken, userId);
     try {
       const request: LogoutRequest = { refreshToken ,userId };
       const response: LogoutResponse = await lastValueFrom(this.authServiceClient.logout(request));
