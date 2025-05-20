@@ -10,6 +10,36 @@ import { Observable } from "rxjs";
 
 export const protobufPackage = "user";
 
+export interface FcmTokenResponse {
+  fcmToken: string | null;
+}
+
+export interface Status {
+  status: boolean;
+}
+
+export interface UpdateRefreshTokenRequest {
+  userId: string;
+  refreshToken: string;
+}
+
+export interface UpdateRefreshTokenResponse {
+  refreshToken: string;
+}
+
+export interface DeleteRefreshTokenRequest {
+  userId: string;
+  refreshToken: string;
+}
+
+export interface DeleteRefreshTokenResponse {
+  success: boolean;
+}
+
+export interface FindUserByEmailDto {
+  email: string;
+}
+
 export interface Empty {
 }
 
@@ -18,22 +48,26 @@ export interface UserList {
 }
 
 export interface FineOneUserDto {
-  id: string;
+  userId: string;
 }
 
 export interface VerifyOneUserDto {
-  isVerified: string;
+  userId: string;
+  isVerified: boolean;
 }
 
 export interface CreateUserDto {
+  userId: string;
   fullName: string;
   email: string;
   phoneNumber: string;
   passwordHash: string;
   /** 'customer', 'delivery_personnel', 'restaurant' */
   role: string;
-  /** 'pending', 'verified', 'rejected' */
-  isVerified: string;
+  /** true or false */
+  isVerified: boolean;
+  refreshToken: string;
+  fcmToken: string;
 }
 
 export interface UpdateUserDto {
@@ -41,7 +75,7 @@ export interface UpdateUserDto {
   fullName: string;
   phoneNumber: string;
   role: string;
-  isVerified: string;
+  isVerified: boolean;
 }
 
 export interface UserResponse {
@@ -50,9 +84,11 @@ export interface UserResponse {
   email: string;
   phoneNumber: string;
   role: string;
-  isVerified: string;
+  isVerified: boolean;
   createdAt: string;
   updatedAt: string;
+  passwordHash: string;
+  fcmToken: string;
 }
 
 export const USER_PACKAGE_NAME = "user";
@@ -62,13 +98,35 @@ export interface UserServiceClient {
 
   findAllUsers(request: Empty): Observable<UserList>;
 
+  findAllCustomers(request: Empty): Observable<UserList>;
+
+  findAllDeliveryPersonnel(request: Empty): Observable<UserList>;
+
+  findAllRestaurants(request: Empty): Observable<UserList>;
+
+  findAllUserByIsVerified(request: Status): Observable<UserList>;
+
+  findAllCustomerByIsVerified(request: Status): Observable<UserList>;
+
+  findAllDeliveryPersonnelByIsVerified(request: Status): Observable<UserList>;
+
+  findAllRestaurantByIsVerified(request: Status): Observable<UserList>;
+
   findUserById(request: FineOneUserDto): Observable<UserResponse>;
 
   updateUser(request: UpdateUserDto): Observable<UserResponse>;
 
   deleteUser(request: FineOneUserDto): Observable<UserResponse>;
 
-  verifyUser(request: FineOneUserDto): Observable<UserResponse>;
+  verifyUser(request: VerifyOneUserDto): Observable<UserResponse>;
+
+  findUserByEmail(request: FindUserByEmailDto): Observable<UserResponse>;
+
+  deleteRefreshToken(request: DeleteRefreshTokenRequest): Observable<DeleteRefreshTokenResponse>;
+
+  updateRefreshToken(request: UpdateRefreshTokenRequest): Observable<UpdateRefreshTokenResponse>;
+
+  findFcmTokenByUserId(request: FineOneUserDto): Observable<FcmTokenResponse>;
 }
 
 export interface UserServiceController {
@@ -76,13 +134,41 @@ export interface UserServiceController {
 
   findAllUsers(request: Empty): Promise<UserList> | Observable<UserList> | UserList;
 
+  findAllCustomers(request: Empty): Promise<UserList> | Observable<UserList> | UserList;
+
+  findAllDeliveryPersonnel(request: Empty): Promise<UserList> | Observable<UserList> | UserList;
+
+  findAllRestaurants(request: Empty): Promise<UserList> | Observable<UserList> | UserList;
+
+  findAllUserByIsVerified(request: Status): Promise<UserList> | Observable<UserList> | UserList;
+
+  findAllCustomerByIsVerified(request: Status): Promise<UserList> | Observable<UserList> | UserList;
+
+  findAllDeliveryPersonnelByIsVerified(request: Status): Promise<UserList> | Observable<UserList> | UserList;
+
+  findAllRestaurantByIsVerified(request: Status): Promise<UserList> | Observable<UserList> | UserList;
+
   findUserById(request: FineOneUserDto): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
 
   updateUser(request: UpdateUserDto): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
 
   deleteUser(request: FineOneUserDto): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
 
-  verifyUser(request: FineOneUserDto): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
+  verifyUser(request: VerifyOneUserDto): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
+
+  findUserByEmail(request: FindUserByEmailDto): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
+
+  deleteRefreshToken(
+    request: DeleteRefreshTokenRequest,
+  ): Promise<DeleteRefreshTokenResponse> | Observable<DeleteRefreshTokenResponse> | DeleteRefreshTokenResponse;
+
+  updateRefreshToken(
+    request: UpdateRefreshTokenRequest,
+  ): Promise<UpdateRefreshTokenResponse> | Observable<UpdateRefreshTokenResponse> | UpdateRefreshTokenResponse;
+
+  findFcmTokenByUserId(
+    request: FineOneUserDto,
+  ): Promise<FcmTokenResponse> | Observable<FcmTokenResponse> | FcmTokenResponse;
 }
 
 export function UserServiceControllerMethods() {
@@ -90,10 +176,21 @@ export function UserServiceControllerMethods() {
     const grpcMethods: string[] = [
       "createUser",
       "findAllUsers",
+      "findAllCustomers",
+      "findAllDeliveryPersonnel",
+      "findAllRestaurants",
+      "findAllUserByIsVerified",
+      "findAllCustomerByIsVerified",
+      "findAllDeliveryPersonnelByIsVerified",
+      "findAllRestaurantByIsVerified",
       "findUserById",
       "updateUser",
       "deleteUser",
       "verifyUser",
+      "findUserByEmail",
+      "deleteRefreshToken",
+      "updateRefreshToken",
+      "findFcmTokenByUserId",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

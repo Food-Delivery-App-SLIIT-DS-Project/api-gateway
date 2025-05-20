@@ -14,47 +14,64 @@ import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { AUTH_PACKAGE_NAME, AUTH_SERVICE_NAME } from './auth/types';
 import { JwtStrategy } from './auth/strategy/JwtStrategy';
-import { OrderModule } from './order/order.module';
-import { PaymentModule } from './payment/payment.module';
+import { RestaurantService } from './restaurant/restaurant.service';
+import { RestaurantController } from './restaurant/restaurant.controller';
+import { RESTAURANT_PACKAGE_NAME, RESTAURANT_SERVICE_NAME } from './restaurant/types/restaurant';
+
+import { ORDER_PACKAGE_NAME, ORDER_SERVICE_NAME } from './order/types/order';
+import { OrderController } from './order/order.controller';
+import { OrderService } from './order/order.service';
+import { PaymentController } from './payment/payment.controller';
+import { PaymentService } from './payment/payment.service';
+import { MenuController } from './restaurant/menu/menu.controller';
+import { MenuService } from './restaurant/menu/menu.service';
+import { MENU_PACKAGE_NAME } from './restaurant/types/menu';
+import { VehicleController } from './delivery/vehicle/vehicle.controller';
+import { DeliveryController } from './delivery/delivery.controller';
+import { VehicleService } from './delivery/vehicle/vehicle.service';
+import { DeliveryService } from './delivery/delivery.service';
+import { DELIVERY_PACKAGE_NAME, DELIVERY_SERVICE_NAME } from './delivery/types/delivery';
+import { VEHICLE_PACKAGE_NAME } from './delivery/types/vehicle';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    // Register microservices (gRPC clients)
+
     ClientsModule.register([
-      // auth service ------------------------------
+      // Only include services NOT already registered in feature modules like RestaurantModule
       {
         name: AUTH_SERVICE_NAME,
         transport: Transport.GRPC,
         options: {
-          url: process.env.AUTH_SERVICE_URL || 'auth-service:50051',
+          url: process.env.AUTH_SERVICE_URL || '0.0.0.0:50051',
           package: AUTH_PACKAGE_NAME,
           protoPath: join(__dirname, '../proto/auth.proto'),
         },
       },
-
-      // Register the user service client------------------
       {
         name: USER_SERVICE_NAME,
         transport: Transport.GRPC,
         options: {
-          url: process.env.USER_SERVICE_URL || 'user-service:50052',
+          url: process.env.USER_SERVICE_URL || '0.0.0.0:50052',
           package: USER_PACKAGE_NAME,
           protoPath: join(__dirname, '../proto/user.proto'),
         },
       },
-
-      // Register the delivery service client------------------------
       {
-        name: 'DELIVERY_SERVICE',
+        name: DELIVERY_SERVICE_NAME,
         transport: Transport.GRPC,
         options: {
-          url: process.env.DELIVERY_SERVICE_URL || 'delivery-service:50053',
-          package: 'delivery',
-          protoPath: join(__dirname, '../proto/delivery.proto'),
+          url: process.env.DELIVERY_SERVICE_URL || 'localhost:50053',
+          package: [
+            DELIVERY_PACKAGE_NAME,
+            VEHICLE_PACKAGE_NAME
+          ],
+          protoPath: [
+            join(__dirname, '../proto/delivery.proto'),
+            join(__dirname, '../proto/vehicle.proto')
+          ]
         },
       },
-      // Register the notification service client-------------------------
       {
         name: 'NOTIFICATION_SERVICE',
         transport: Transport.GRPC,
@@ -64,42 +81,49 @@ import { PaymentModule } from './payment/payment.module';
           protoPath: join(__dirname, '../proto/notification.proto'),
         },
       },
-      // Register the order service client-------------------------
       {
-        name: 'ORDER_SERVICE',
+        name: ORDER_SERVICE_NAME,
         transport: Transport.GRPC,
         options: {
-          url: process.env.ORDER_SERVICE_URL || 'order-service:50055',
-          package: 'order',
+          url: process.env.ORDER_SERVICE_URL || '0.0.0.0:50055',
+          package: ORDER_PACKAGE_NAME,
           protoPath: join(__dirname, '../proto/order.proto'),
         },
       },
-      // Register the payment service client--------------------------
       {
         name: 'PAYMENT_SERVICE',
         transport: Transport.GRPC,
         options: {
-          url: process.env.PAYMENT_SERVICE_URL || 'payment-service:50056',
+          url: process.env.PAYMENT_SERVICE_URL || '0.0.0.0:50056',
           package: 'payment',
           protoPath: join(__dirname, '../proto/payment.proto'),
         },
       },
-      // Register the restaurant service client---------------------
       {
-        name: 'RESTAURANT_SERVICE',
+        name: RESTAURANT_SERVICE_NAME,
         transport: Transport.GRPC,
         options: {
-          url: process.env.RESTAURANT_SERVICE_URL || 'restaurant-service:50057',
-          package: 'restaurant',
-          protoPath: join(__dirname, '../proto/restaurant.proto'),
+          url: process.env.RESTAURANT_SERVICE_URL || '0.0.0.0:50057',
+          package: [RESTAURANT_PACKAGE_NAME, MENU_PACKAGE_NAME],
+          protoPath: [join(__dirname, '../proto/restaurant.proto'), join(__dirname, '../proto/menu.proto')],
         },
       },
     ]),
-    OrderModule,
-    PaymentModule,
   ],
-  controllers: [UserController, AuthController, AppController],
-  providers: [UserService, JwtStrategy, AuthService],
+  controllers: [
+    UserController,
+    AuthController,
+    AppController,
+    RestaurantController,
+    OrderController,
+    PaymentController,
+    MenuController,
+    VehicleController,
+    DeliveryController
+  ],
+  providers: [UserService, JwtStrategy, AuthService, RestaurantService, OrderService, PaymentService, MenuService,
+    VehicleService, DeliveryService
+  ],
   exports: [AuthService],
 })
 export class AppModule {}

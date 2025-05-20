@@ -16,6 +16,8 @@ export interface SignUpRequest {
   phoneNumber: string;
   password: string;
   role: string;
+  /** optional */
+  fcmToken?: string | undefined;
 }
 
 export interface AuthResponse {
@@ -31,12 +33,16 @@ export interface User {
   email: string;
   phoneNumber: string;
   role: string;
-  isVerified: string;
+  isVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface SignInRequest {
   email: string;
   password: string;
+  /** optional */
+  fcmToken?: string | undefined;
 }
 
 export interface RefreshTokenRequest {
@@ -52,8 +58,8 @@ export interface VerifyTokenResponse {
 }
 
 export interface LogoutRequest {
-  userId: string;
   refreshToken: string;
+  userId: string;
 }
 
 export interface LogoutResponse {
@@ -93,31 +99,52 @@ export interface AuthServiceClient {
 
   logout(request: LogoutRequest): Observable<LogoutResponse>;
 
-  changePassword(request: ChangePasswordRequest): Observable<ChangePasswordResponse>;
-
-  forgotPassword(request: ForgotPasswordRequest): Observable<ForgotPasswordResponse>;
-}
-
-export interface AuthServiceController {
-  signUp(request: SignUpRequest): Promise<AuthResponse> | Observable<AuthResponse> | AuthResponse;
-
-  signIn(request: SignInRequest): Promise<AuthResponse> | Observable<AuthResponse> | AuthResponse;
-
-  refreshToken(request: RefreshTokenRequest): Promise<AuthResponse> | Observable<AuthResponse> | AuthResponse;
-
-  verifyToken(
-    request: VerifyTokenRequest,
-  ): Promise<VerifyTokenResponse> | Observable<VerifyTokenResponse> | VerifyTokenResponse;
-
-  logout(request: LogoutRequest): Promise<LogoutResponse> | Observable<LogoutResponse> | LogoutResponse;
-
   changePassword(
     request: ChangePasswordRequest,
-  ): Promise<ChangePasswordResponse> | Observable<ChangePasswordResponse> | ChangePasswordResponse;
+  ): Observable<ChangePasswordResponse>;
 
   forgotPassword(
     request: ForgotPasswordRequest,
-  ): Promise<ForgotPasswordResponse> | Observable<ForgotPasswordResponse> | ForgotPasswordResponse;
+  ): Observable<ForgotPasswordResponse>;
+}
+
+export interface AuthServiceController {
+  signUp(
+    request: SignUpRequest,
+  ): Promise<AuthResponse> | Observable<AuthResponse> | AuthResponse;
+
+  signIn(
+    request: SignInRequest,
+  ): Promise<AuthResponse> | Observable<AuthResponse> | AuthResponse;
+
+  refreshToken(
+    request: RefreshTokenRequest,
+  ): Promise<AuthResponse> | Observable<AuthResponse> | AuthResponse;
+
+  verifyToken(
+    request: VerifyTokenRequest,
+  ):
+    | Promise<VerifyTokenResponse>
+    | Observable<VerifyTokenResponse>
+    | VerifyTokenResponse;
+
+  logout(
+    request: LogoutRequest,
+  ): Promise<LogoutResponse> | Observable<LogoutResponse> | LogoutResponse;
+
+  changePassword(
+    request: ChangePasswordRequest,
+  ):
+    | Promise<ChangePasswordResponse>
+    | Observable<ChangePasswordResponse>
+    | ChangePasswordResponse;
+
+  forgotPassword(
+    request: ForgotPasswordRequest,
+  ):
+    | Promise<ForgotPasswordResponse>
+    | Observable<ForgotPasswordResponse>
+    | ForgotPasswordResponse;
 }
 
 export function AuthServiceControllerMethods() {
@@ -132,13 +159,27 @@ export function AuthServiceControllerMethods() {
       'forgotPassword',
     ];
     for (const method of grpcMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod('AuthService', method)(constructor.prototype[method], method, descriptor);
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(
+        constructor.prototype,
+        method,
+      );
+      GrpcMethod('AuthService', method)(
+        constructor.prototype[method],
+        method,
+        descriptor,
+      );
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod('AuthService', method)(constructor.prototype[method], method, descriptor);
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(
+        constructor.prototype,
+        method,
+      );
+      GrpcStreamMethod('AuthService', method)(
+        constructor.prototype[method],
+        method,
+        descriptor,
+      );
     }
   };
 }

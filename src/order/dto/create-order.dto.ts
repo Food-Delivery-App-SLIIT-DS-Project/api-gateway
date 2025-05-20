@@ -1,25 +1,21 @@
-// create-order.dto.ts
 import { Type } from 'class-transformer';
-import { 
-  IsArray, 
-  IsNotEmpty, 
-  IsNumber, 
-  IsString, 
-  IsUUID, 
-  ValidateNested, 
-  IsEnum 
-} from 'class-validator';
+import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
 
+// Reusable enum for order status
 export enum OrderStatus {
   PENDING = 'PENDING',
-  PROCESSING = 'PROCESSING',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED',
-  OUT_FOR_DELIVERY = 'OUT_FOR_DELIVERY'
+  ACCEPTED = 'ACCEPTED',
+  REJECTED = 'REJECTED',
+  PREPARING = 'PREPARING',
+  WAITING_FOR_PICKUP = 'WAITING_FOR_PICKUP',
+  OUT_FOR_DELIVERY = 'OUT_FOR_DELIVERY',
+  DELIVERED = 'DELIVERED',
+  CANCELED = 'CANCELED',
 }
 
+// DTO for each order item
 export class OrderItemDto {
-  @IsUUID()
+  @IsString() // Assuming menuId is a string, adjust if it's a UUID
   @IsNotEmpty()
   menuId: string;
 
@@ -32,17 +28,18 @@ export class OrderItemDto {
   price: number;
 }
 
+// DTO for creating a new order
 export class CreateOrderDto {
   @IsUUID()
   @IsNotEmpty()
   customerId: string;
 
-  @IsUUID()
+  @IsString() // Updated from IsUUID to IsString if you're using custom ID format like "res_456"
   @IsNotEmpty()
   restaurantId: string;
 
-  @IsUUID()
-  @IsNotEmpty()
+  @IsString()
+  @IsOptional()
   deliveryId: string;
 
   @IsEnum(OrderStatus)

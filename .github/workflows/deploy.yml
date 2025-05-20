@@ -1,0 +1,119 @@
+name: Deploy api-gateway Service to K3s
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_NAME: mash02/api-gateway
+  IMAGE_TAG: latest
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Create namespace.yaml
+        run: |
+          cat <<EOF > namespace.yaml
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: api-gateway
+          EOF
+
+      - name: Write api-gateway-secret.yaml from GitHub Secret
+        run: |
+          echo "${{ secrets.API_GATEWAY_SERVICE_SECRET_YAML_BASE64 }}" | base64 -d > api-gateway-secret.yaml
+
+      - name: Create api-gateway.yaml (Deployment + Service)
+        run: |
+          cat <<EOF > api-gateway.yaml
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: api-gateway
+            namespace: api-gateway
+            labels:
+              app: api-gateway
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: api-gateway
+            template:
+              metadata:
+                labels:
+                  app: api-gateway
+              spec:
+                containers:
+                  - name: api-gateway
+                    image: ${IMAGE_NAME}:${IMAGE_TAG}
+                    ports:
+                      - containerPort: 3000
+                    envFrom:
+                      - secretRef:
+                          name: api-gateway-secret
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: api-gateway
+            namespace: api-gateway
+          spec:
+            type: NodePort
+            selector:
+              app: api-gateway
+            ports:
+              - protocol: TCP
+                port: 3000
+                targetPort: 3000
+                nodePort: 30275
+          EOF
+
+      - name: Check generated files
+        run: |
+          echo "--- namespace.yaml ---" && cat namespace.yaml
+          echo "--- api-gateway-secret.yaml ---" && cat api-gateway-secret.yaml
+          echo "--- api-gateway.yaml ---" && cat api-gateway.yaml
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t $IMAGE_NAME:$IMAGE_TAG .
+          docker push $IMAGE_NAME:$IMAGE_TAG
+
+      - name: Install OpenSSH client
+        run: sudo apt-get update && sudo apt-get install -y openssh-client
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Test SSH connection
+        run: ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} 'echo "SSH connection successful"'
+
+      - name: Deploy to EC2
+        run: |
+          ssh ubuntu@${{ secrets.EC2_HOST }} "mkdir -p ~/deploy/api-gateway"
+          scp namespace.yaml api-gateway-secret.yaml api-gateway.yaml ubuntu@${{ secrets.EC2_HOST }}:~/deploy/api-gateway/
+          ssh ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+            cd ~/deploy/api-gateway
+            sudo kubectl apply -f namespace.yaml
+            sudo kubectl apply -f api-gateway-secret.yaml
+            sudo kubectl apply -f api-gateway.yaml
+          EOF
