@@ -1,21 +1,40 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Controller, Post, Body, Get, Delete, Param } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { errorResponse, successResponse } from 'utils/response';
 import { firstValueFrom } from 'rxjs';
+import { CreateOrderRequest } from './types/order';
 
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
+  // create order
+
   @Post()
   async placedOrder(@Body() createOrderDto: CreateOrderDto) {
+    console.log('Placing order with DTO:', createOrderDto);
+    const dto = createOrderDto;
+
+    const grpcPayload:CreateOrderRequest = {
+      customerId: dto.customerId,
+      restaurantId: dto.restaurantId,
+      items: dto.items,
+      totalPrice: dto.totalPrice,
+      status: dto.status,
+      deliveryId: dto.deliveryId || '', // Avoid undefined
+    };
+
     try {
-      const result = await firstValueFrom(this.orderService.placeOrder(createOrderDto));
+
+
+      const result = await firstValueFrom(this.orderService.placeOrder(grpcPayload));
       return successResponse('Order placed successfully', result);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
+      console.error('Error placing order:', err);
       return errorResponse(100, 'Failed to place order');
     }
   }
@@ -27,6 +46,27 @@ export class OrderController {
       return successResponse('All orders fetched', result);
     } catch (err) {
       return errorResponse(101, 'Failed to fetch orders');
+    }
+  }
+
+  // get orders by restauantId
+  @Get('restaurant/:id')
+  async getOrderByRestaurantId(@Param('id') restaurantId: string) {
+    try {
+      const result = await firstValueFrom(this.orderService.getOrderByRestaurantId({ restaurantId }));
+      return successResponse('Orders fetched by restaurant ID', result);
+    } catch (err) {
+      return errorResponse(100, 'Failed to fetch orders by restaurant ID');
+    }
+  }
+  // get orders by customerId
+  @Get('customer/:id')
+  async getOrderByCustomerId(@Param('id') customerId: string) {
+    try {
+      const result = await firstValueFrom(this.orderService.getOrderByCustomerId({ customerId }));
+      return successResponse('Orders fetched by customer ID', result);
+    } catch (err) {
+      return errorResponse(101, 'Failed to fetch orders by customer ID');
     }
   }
 

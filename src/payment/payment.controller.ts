@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -92,5 +93,19 @@ export class PaymentController {
       msg,
       data: null,
     };
+  }
+  // update payment status ----------------
+  @Post('update/status')
+  async updatePaymentStatus(@Body() body: { transactionId: string; status: string }) {
+    try {
+      const result = await firstValueFrom(this.paymentService.updatePaymentStatus(body.transactionId, body.status));
+      return {
+        code: 0,
+        msg: 'Payment status updated successfully',
+        data: result,
+      };
+    } catch (error) {
+      return this.handleGrpcError(error);
+    }
   }
 }

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post } from '@nestjs/common';
 
 import { lastValueFrom } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -186,7 +186,7 @@ export class VehicleController {
 
   // get vehicle by driver id
   @Get('driver/:id')
-  async getVehicleByDriverId(@Body('id') driverId: string) {
+  async getVehicleByDriverId(@Param('id') driverId: string) {
     try {
       const vehicle = await lastValueFrom(
         this.vehicleService.getVehicleByDriverId({ driverId }).pipe(

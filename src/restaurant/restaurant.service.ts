@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import {
@@ -58,40 +59,41 @@ export class RestaurantService implements OnModuleInit {
     return this.restaurantServiceClient.deleteRestaurant(request);
   }
 
-  // ----------- New Functions -----------
+  // --------------- new----------------
+  getRestaurantByName(request: { name: string }): Observable<RestaurantResponse> {
+  return this.restaurantServiceClient.getRestaurantByName(request);
+}
 
-  // Get restaurant by name
-  findRestaurantByName(request: NameRequest): Observable<RestaurantResponse> {
-    return this.restaurantServiceClient.getRestaurantByName(request);
-  }
+getRestaurantsByCuisine(request: { cuisine: string }): Observable<RestaurantList> {
+  return this.restaurantServiceClient.getRestaurantsByCuisine(request);
+}
 
-  // Get restaurants by cuisine type
-  findRestaurantsByCuisine(request: CuisineRequest): Observable<RestaurantList> {
-    return this.restaurantServiceClient.getRestaurantsByCuisine(request);
-  }
+getRestaurantsByUserId(request: { userId: string }): Observable<RestaurantList> {
+  return this.restaurantServiceClient.getRestaurantsByUserId(request);
+}
 
-  // Get restaurants by user ID
-  findRestaurantsByUserId(request: UserIdRequest): Observable<RestaurantList> {
-    return this.restaurantServiceClient.getRestaurantsByUserId(request);
-  }
+updateIsVerified(request: { restaurantId: string; isVerified: boolean }): Observable<RestaurantResponse> {
+  return this.restaurantServiceClient.updateIsVerified(request);
+}
 
-  // Update restaurant verification status
-  updateRestaurantVerificationStatus(request: UpdateIsVerifiedRequest): Observable<RestaurantResponse> {
-    return this.restaurantServiceClient.updateIsVerified(request);
-  }
+updateIsOpen(request: { restaurantId: string; isOpen: boolean }): Observable<RestaurantResponse> {
+  return this.restaurantServiceClient.updateIsOpen(request);
+}
 
-  // Update restaurant open status
-  updateRestaurantOpenStatus(request: UpdateIsOpenRequest): Observable<RestaurantResponse> {
-    return this.restaurantServiceClient.updateIsOpen(request);
-  }
+getRestaurantsByLocation(request: { latitude: number; longitude: number; radius: number }): Observable<RestaurantList> {
+  return this.restaurantServiceClient.getRestaurantsByLocation(request);
+}
 
-  // Get restaurants by location
-  findRestaurantsByLocation(request: LocationRequest): Observable<RestaurantList> {
-    return this.restaurantServiceClient.getRestaurantsByLocation(request);
-  }
+getAllRestaurantsWithFilters(): Observable<RestaurantList> {
+  return this.restaurantServiceClient.getAllRestaurantsWithFilters({});
+}
 
-  // Update restaurant rating
-  updateRestaurantRating(request: RatingIncrease): Observable<Empty> {
-    return this.restaurantServiceClient.updateRating(request);
-  }
+increaseRating(request: { restaurantId: string }): Observable<any> {
+  return this.restaurantServiceClient.updateRating(request);
+}
+
+decreaseRating(request: { restaurantId: string }): Observable<any> {
+  return this.restaurantServiceClient.decreaseRating(request);
+}
+
 }
