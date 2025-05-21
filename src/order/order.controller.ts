@@ -18,18 +18,20 @@ export class OrderController {
     console.log('Placing order with DTO:', createOrderDto);
     const dto = createOrderDto;
 
-    const grpcPayload:CreateOrderRequest = {
+    const grpcPayload: CreateOrderRequest = {
       customerId: dto.customerId,
       restaurantId: dto.restaurantId,
       items: dto.items,
       totalPrice: dto.totalPrice,
       status: dto.status,
       deliveryId: dto.deliveryId || '', // Avoid undefined
+      customerLocation: {
+        latitude: dto.customerLocation.lat,
+        longitude: dto.customerLocation.lng,
+      },
     };
 
     try {
-
-
       const result = await firstValueFrom(this.orderService.placeOrder(grpcPayload));
       return successResponse('Order placed successfully', result);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -44,6 +44,12 @@ export interface CreateOrderRequest {
   status?: string | undefined;
   totalPrice: number;
   items: OrderItemInput[];
+  customerLocation: Location | undefined;
+}
+
+export interface Location {
+  latitude: number;
+  longitude: number;
 }
 
 export interface OrderItem {
@@ -60,6 +66,7 @@ export interface OrderResponse {
   status: string;
   totalPrice: number;
   items: OrderItem[];
+  customerLocation: Location | undefined;
 }
 
 export interface OrderList {
