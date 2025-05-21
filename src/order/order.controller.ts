@@ -18,18 +18,20 @@ export class OrderController {
     console.log('Placing order with DTO:', createOrderDto);
     const dto = createOrderDto;
 
-    const grpcPayload:CreateOrderRequest = {
+    const grpcPayload: CreateOrderRequest = {
       customerId: dto.customerId,
       restaurantId: dto.restaurantId,
       items: dto.items,
       totalPrice: dto.totalPrice,
       status: dto.status,
       deliveryId: dto.deliveryId || '', // Avoid undefined
+      customerLocation: {
+        latitude: dto.customerLocation.lat,
+        longitude: dto.customerLocation.lng,
+      },
     };
 
     try {
-
-
       const result = await firstValueFrom(this.orderService.placeOrder(grpcPayload));
       return successResponse('Order placed successfully', result);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -97,6 +99,16 @@ export class OrderController {
       return successResponse('Order removed', result);
     } catch (err) {
       return errorResponse(104, 'Failed to remove order');
+    }
+  }
+  // assign delivery id --------
+  @Post('assign-deliveryId')
+  async assignDeliveryId(@Body('orderId') orderId: string, @Body('deliveryId') deliveryId: string) {
+    try {
+      const result = await firstValueFrom(this.orderService.assignDeliveryId(orderId, deliveryId));
+      return successResponse('Delivery ID assigned', result);
+    } catch (err) {
+      return errorResponse(105, 'Failed to assign delivery ID');
     }
   }
 }

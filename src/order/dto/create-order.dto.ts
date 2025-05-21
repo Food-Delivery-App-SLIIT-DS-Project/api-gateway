@@ -54,4 +54,10 @@ export class CreateOrderDto {
   @ValidateNested({ each: true })
   @Type(() => OrderItemDto)
   items: OrderItemDto[];
+
+  @IsNotEmpty()
+  customerLocation: {
+    lat: number;
+    lng: number;
+  };
 }
