@@ -101,4 +101,14 @@ export class OrderController {
       return errorResponse(104, 'Failed to remove order');
     }
   }
+  // assign delivery id --------
+  @Post('assign-deliveryId')
+  async assignDeliveryId(@Body('orderId') orderId: string, @Body('deliveryId') deliveryId: string) {
+    try {
+      const result = await firstValueFrom(this.orderService.assignDeliveryId(orderId, deliveryId));
+      return successResponse('Delivery ID assigned', result);
+    } catch (err) {
+      return errorResponse(105, 'Failed to assign delivery ID');
+    }
+  }
 }

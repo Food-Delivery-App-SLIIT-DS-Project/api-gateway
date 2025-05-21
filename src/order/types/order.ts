@@ -11,6 +11,11 @@ import { Observable } from "rxjs";
 
 export const protobufPackage = "order";
 
+export interface AssignDeliveryRequest {
+  orderId: string;
+  deliveryId: string;
+}
+
 export interface RestaurantID {
   restaurantId: string;
 }
@@ -93,6 +98,8 @@ export interface OrderServiceClient {
   getOrderByRestaurantId(request: RestaurantID): Observable<OrderList>;
 
   getOrderByCustomerId(request: CustomerID): Observable<OrderList>;
+
+  assignDeliveryId(request: AssignDeliveryRequest): Observable<OrderResponse>;
 }
 
 export interface OrderServiceController {
@@ -109,6 +116,8 @@ export interface OrderServiceController {
   getOrderByRestaurantId(request: RestaurantID): Promise<OrderList> | Observable<OrderList> | OrderList;
 
   getOrderByCustomerId(request: CustomerID): Promise<OrderList> | Observable<OrderList> | OrderList;
+
+  assignDeliveryId(request: AssignDeliveryRequest): Promise<OrderResponse> | Observable<OrderResponse> | OrderResponse;
 }
 
 export function OrderServiceControllerMethods() {
@@ -121,6 +130,7 @@ export function OrderServiceControllerMethods() {
       "removeOrder",
       "getOrderByRestaurantId",
       "getOrderByCustomerId",
+      "assignDeliveryId",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

@@ -45,4 +45,9 @@ export class OrderService implements OnModuleInit {
     // Logic to remove an order
     return this.orderServiceClient.removeOrder({ orderId: id });
   }
+  // assign delivery id -----------------
+  assignDeliveryId(id: string, deliveryId: string) {
+    // Logic to assign delivery id
+    return this.orderServiceClient.assignDeliveryId({ orderId: id, deliveryId });
+  }
 }
