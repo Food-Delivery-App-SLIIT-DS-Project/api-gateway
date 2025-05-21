@@ -32,6 +32,9 @@ import { VehicleService } from './delivery/vehicle/vehicle.service';
 import { DeliveryService } from './delivery/delivery.service';
 import { DELIVERY_PACKAGE_NAME, DELIVERY_SERVICE_NAME } from './delivery/types/delivery';
 import { VEHICLE_PACKAGE_NAME } from './delivery/types/vehicle';
+import { EMAIL_SERVICE_NAME, EMAIL_PACKAGE_NAME } from './email/types/email';
+import { EmailController } from './email/email.controller';
+import { EmailService } from './email/email.service';
 
 @Module({
   imports: [
@@ -108,6 +111,15 @@ import { VEHICLE_PACKAGE_NAME } from './delivery/types/vehicle';
           protoPath: [join(__dirname, '../proto/restaurant.proto'), join(__dirname, '../proto/menu.proto')],
         },
       },
+      {
+      name: EMAIL_SERVICE_NAME,
+      transport: Transport.GRPC,
+      options: {
+        url: process.env.EMAIL_SERVICE_URL || '0.0.0.0:50058',
+        package: EMAIL_PACKAGE_NAME,
+        protoPath: join(__dirname, '../proto/email.proto')
+      },
+    },
     ]),
   ],
   controllers: [
@@ -119,10 +131,11 @@ import { VEHICLE_PACKAGE_NAME } from './delivery/types/vehicle';
     PaymentController,
     MenuController,
     VehicleController,
-    DeliveryController
+    DeliveryController,
+    EmailController
   ],
   providers: [UserService, JwtStrategy, AuthService, RestaurantService, OrderService, PaymentService, MenuService,
-    VehicleService, DeliveryService
+    VehicleService, DeliveryService, EmailService
   ],
   exports: [AuthService],
 })
